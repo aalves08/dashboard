@@ -55,6 +55,8 @@ export default {
     rows() {
       // If Harvester feature is enabled, hide Harvester Clusters
       if (this.harvesterEnabled) {
+        console.log('RKE1 LIST VIEW', filterOnlyKubernetesClusters(this.rancherClusters).filter(c => c.nameDisplay === 'rke1-test'));
+
         return filterOnlyKubernetesClusters(this.rancherClusters);
       }
 
