@@ -59,7 +59,14 @@ export default {
   components: {
     THead, Checkbox, ActionDropdown
   },
-  mixins: [filtering, sorting, paging, grouping, selection, actions],
+  mixins: [
+    filtering,
+    sorting,
+    paging,
+    grouping,
+    selection,
+    actions
+  ],
 
   props: {
     headers: {
@@ -326,7 +333,7 @@ export default {
   watch: {
     eventualSearchQuery: debounce(function(q) {
       this.searchQuery = q;
-    }, 100),
+    }, 200),
   },
 
   computed: {
@@ -477,6 +484,7 @@ export default {
 
           this.columns.forEach((c) => {
             const value = c.delayLoading ? undefined : this.valueFor(row, c);
+
             let component;
             let formatted = value;
             let needRef = false;

@@ -383,6 +383,18 @@ export default function(dir, _appConfig) {
       ],
 
       extend(config, { isClient, isDev }) {
+        // Start web worker config (worker-loader)
+        config.output.globalObject = 'this';
+
+        if (isClient) {
+          config.module.rules.push({
+            test:    /\.worker\.js$/,
+            loader:  'worker-loader',
+            exclude: /(node_modules)/,
+          });
+        }
+        // end web worker config
+
         if ( isDev ) {
           config.devtool = 'cheap-module-source-map';
         } else {

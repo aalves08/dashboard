@@ -9,6 +9,7 @@ import SteveModel from '@shell/plugins/steve/steve-class';
 import { shortenedImage } from '@shell/utils/string';
 import { convertSelectorObj, matching } from '@shell/utils/selector';
 import { SEPARATOR } from '@shell/components/DetailTop';
+import { performExpensiveOp } from '../worker-api';
 
 export default class Workload extends SteveModel {
   // remove clone as yaml/edit as yaml until API supported
@@ -189,18 +190,23 @@ export default class Workload extends SteveModel {
     return true;
   }
 
-  get restartCount() {
+  async restartCount() {
     const pods = this.pods;
-
-    let sum = 0;
-
-    pods.forEach((pod) => {
-      if (pod.status.containerStatuses) {
-        sum += pod.status?.containerStatuses[0].restartCount || 0;
-      }
-    });
+    const sum = await performExpensiveOp(pods);
 
     return sum;
+
+    // const pods = this.pods;
+
+    // let sum = 0;
+
+    // pods.forEach((pod) => {
+    //   if (pod.status.containerStatuses) {
+    //     sum += pod.status?.containerStatuses[0].restartCount || 0;
+    //   }
+    // });
+
+    // return sum;
   }
 
   get hasSidecars() {
