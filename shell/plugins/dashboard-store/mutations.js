@@ -35,6 +35,8 @@ export function load(state, { data, ctx, existing }) {
   let type = normalizeType(data.type);
   const keyField = getters.keyFieldForType(type);
   const opts = ctx.rootGetters[`type-map/optionsFor`](type);
+
+  console.log('options', opts);
   const limit = opts?.limit;
 
   // Inject special fields for indexing schemas
@@ -177,14 +179,14 @@ export function loadAll(state, {
   }
 
   const keyField = getters.keyFieldForType(type);
-  const proxies = data.map(x => classify(ctx, x));
+  const proxies = data.map(x => classify(ctx, x)); // turns to JS class
   const cache = registerType(state, type);
 
   clear(cache.list);
   cache.map.clear();
   cache.generation++;
 
-  addObjects(cache.list, proxies);
+  addObjects(cache.list, proxies); // sets it onto the store!!! this is the reactivity bit
 
   for ( let i = 0 ; i < proxies.length ; i++ ) {
     cache.map.set(proxies[i][keyField], proxies[i]);

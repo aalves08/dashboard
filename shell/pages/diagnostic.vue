@@ -5,6 +5,7 @@ import { downloadFile } from '@shell/utils/download';
 import { filterOnlyKubernetesClusters, filterHiddenLocalCluster } from '@shell/utils/cluster';
 import { sortBy } from '@shell/utils/sort';
 import { Checkbox } from '@components/Form/Checkbox';
+import { mapGetters } from 'vuex';
 
 export default {
   layout:     'plain',
@@ -135,11 +136,18 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({ listData: 'resource-fetch/list' }),
     name() {
       return this.data;
     }
   },
   methods: {
+    replaceItemOnList() {
+      this.$store.dispatch('resource-fetch/replaceItemOnList');
+    },
+    updateWholeList() {
+      this.$store.dispatch('resource-fetch/updateWholeList');
+    },
     scrollLogsToBottom() {
       this.$nextTick(() => {
         const logsContainer = document.querySelector('.logs-container');
@@ -240,6 +248,15 @@ export default {
         v-t="'about.diagnostic.title'"
         class="mt-20 mb-40"
       />
+      <ul v-for="(item, index) in listData" :key="index">
+        <li>{{ item.name }}</li>
+      </ul>
+      <button type="button" @click="replaceItemOnList">
+        replaceItemOnList
+      </button>
+      <button type="button" @click="updateWholeList">
+        updateWholeList
+      </button>
       <div>
         <Checkbox
           v-model="includeResponseTimes"

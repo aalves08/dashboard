@@ -297,7 +297,7 @@ export default {
           ctx,
           type,
           data: out.data,
-          skipHaveAll
+          skipHaveAll,
         });
       }
     }

@@ -1,15 +1,22 @@
+import Vue from 'vue';
+
 export const state = function() {
   return {
     refreshFlag:                null,
     isTooManyItemsToAutoUpdate: false,
     manualRefreshIsLoading:     false,
+    list:                       [
+      Object.freeze({ name: 'item1' }),
+      Object.freeze({ name: 'item2' }),
+    ]
   };
 };
 
 export const getters = {
   isTooManyItemsToAutoUpdate: state => state.isTooManyItemsToAutoUpdate,
   refreshFlag:                state => state.refreshFlag,
-  manualRefreshIsLoading:     state => state.manualRefreshIsLoading
+  manualRefreshIsLoading:     state => state.manualRefreshIsLoading,
+  list:                       state => state.list
 };
 
 export const mutations = {
@@ -21,6 +28,12 @@ export const mutations = {
   },
   updateManualRefreshIsLoading(state, data) {
     state.manualRefreshIsLoading = data;
+  },
+  updateWholeList(state, data) {
+    Vue.set(state, 'list', [{ name: 'item3' }, { name: 'item4' }]);
+  },
+  replaceItemOnList(state, data) {
+    Vue.set(state.list, 1, { name: 'this-is-a-special-one' });
   },
 };
 
@@ -40,5 +53,11 @@ export const actions = {
     const finalData = new Date().getTime();
 
     commit('updateRefreshFlag', finalData);
+  },
+  updateWholeList({ commit }, data) {
+    commit('updateWholeList', data);
+  },
+  replaceItemOnList({ commit }, data) {
+    commit('replaceItemOnList', data);
   },
 };
