@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-export default (context) => {
+export default () => {
   const logTypes = ['log', 'error', 'info', 'warn'];
   const MAX_LOGS_STORED = 400;
 

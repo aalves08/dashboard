@@ -297,7 +297,8 @@ export default {
           ctx,
           type,
           data: out.data,
-          skipHaveAll
+          skipHaveAll,
+          opt,
         });
       }
     }
@@ -471,13 +472,14 @@ export default {
     });
   },
 
-  loadAll(ctx, { type, data }) {
+  loadAll(ctx, { type, data, opt }) {
     const { commit } = ctx;
 
     commit('loadAll', {
       ctx,
       type,
-      data
+      data,
+      opt
     });
   },
 

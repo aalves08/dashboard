@@ -51,16 +51,18 @@ export function load(state, { data, ctx, existing }) {
 
   let entry;
 
-  function replace(existing, data) {
-    data = getters.cleanResource(existing, data);
+  function replace(existing, data, list) {
+    // if (type && type === POD) {
+    //   data = getters.cleanResource(existing, data);
+    //   for ( const k of Object.keys(existing) ) {
+    //     delete existing[k];
+    //   }
 
-    for ( const k of Object.keys(existing) ) {
-      delete existing[k];
-    }
+    //   for ( const k of Object.keys(data) ) {
+    //     Vue.set(existing, k, data[k]);
+    //   }
 
-    for ( const k of Object.keys(data) ) {
-      Vue.set(existing, k, data[k]);
-    }
+    Vue.set(list, list.findIndex(item => item.id === existing.id), data);
 
     return existing;
   }
@@ -68,7 +70,7 @@ export function load(state, { data, ctx, existing }) {
   if ( existing && !existing.id ) {
     // A specific proxy instance to used was passed in (for create -> save),
     // use it instead of making a new proxy
-    entry = replace(existing, data);
+    entry = classify(ctx, data);
     addObject(cache.list, entry);
     cache.map.set(id, entry);
     // console.log('### Mutation added from existing proxy', type, id);
@@ -77,7 +79,9 @@ export function load(state, { data, ctx, existing }) {
 
     if ( entry ) {
       // There's already an entry in the store, update it
-      replace(entry, data);
+      const newData = classify(ctx, data);
+
+      replace(entry, newData, cache.list);
       // console.log('### Mutation Updated', type, id);
     } else {
       // There's no entry, make a new proxy
@@ -160,7 +164,8 @@ export function loadAll(state, {
   type,
   data,
   ctx,
-  skipHaveAll
+  skipHaveAll,
+  opt,
 }) {
   const { getters } = ctx;
 
@@ -184,7 +189,19 @@ export function loadAll(state, {
   cache.map.clear();
   cache.generation++;
 
-  addObjects(cache.list, proxies);
+  if (opt && opt.freeze) {
+    console.log('************ TYPE with freeze on mutation loadAll ***********', type);
+    const frozenArrayObjs = [];
+
+    proxies.forEach((item) => {
+      frozenArrayObjs.push(Object.freeze(item));
+    });
+    addObjects(cache.list, frozenArrayObjs);
+  } else {
+    addObjects(cache.list, proxies);
+  }
+
+  // addObjects(cache.list, proxies);
 
   for ( let i = 0 ; i < proxies.length ; i++ ) {
     cache.map.set(proxies[i][keyField], proxies[i]);

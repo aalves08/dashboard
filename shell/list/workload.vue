@@ -60,6 +60,14 @@ export default {
   data() {
     return { resources: [] };
   },
+  watch: {
+    rows: {
+      handler(neu) {
+        console.log('CHANGED!!!!');
+      },
+      deep: true
+    }
+  },
 
   computed: {
     allTypes() {
@@ -118,7 +126,7 @@ export default {
     loadHeathResources() {
       // Fetch these in the background to populate workload health
       if ( this.allTypes ) {
-        this.$store.dispatch('cluster/findAll', { type: POD });
+        this.$store.dispatch('cluster/findAll', { type: POD, opt: { freeze: true } });
         this.$store.dispatch('cluster/findAll', { type: WORKLOAD_TYPES.JOB });
       } else {
         const type = this.$route.params.resource;

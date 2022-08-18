@@ -74,7 +74,7 @@ export default {
     }
   },
   methods:  {
-    $fetchType(type, multipleResources = []) {
+    $fetchType(type, multipleResources = [], opt) {
       const inStore = this.$store.getters['currentStore'](COUNT);
 
       if (!this.init) {
@@ -94,9 +94,12 @@ export default {
         this.fetchedResourceType.push(type);
       }
 
+      console.log('FETCH TYPE', type, opt);
+
       return this.$store.dispatch(`${ inStore }/findAll`, {
         type,
         opt: {
+          ...opt,
           incremental:      this.incremental,
           watch:            this.watch,
           force:            this.force,
