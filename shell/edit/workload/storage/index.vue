@@ -60,6 +60,10 @@ export default {
       type:    Function,
       default: null,
     },
+    loading: {
+      default: false,
+      type:    Boolean
+    },
   },
 
   async fetch() {
@@ -296,6 +300,7 @@ export default {
             :pvcs="pvcNames"
             :register-before-hook="registerBeforeHook"
             :save-pvc-hook-name="savePvcHookName"
+            :loading="loading"
             @removePvcForm="removePvcForm"
           />
           <div v-else-if="isView">

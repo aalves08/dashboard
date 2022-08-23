@@ -61,6 +61,7 @@ export default {
             :mode="mode"
             :label="t('workload.serviceName')"
             :options="headlessServices"
+            :loading="isLoadingSecondaryResources"
             required
           />
         </div>
@@ -123,6 +124,7 @@ export default {
                   :mode="mode"
                   option-label="metadata.name"
                   :reduce="service=>service.metadata.name"
+                  :loading="isLoadingSecondaryResources"
                 />
               </div>
             </div>
@@ -139,7 +141,13 @@ export default {
           <div class="spacer"></div>
           <div>
             <h3>{{ t('workload.container.titles.command') }}</h3>
-            <Command v-model="container" :secrets="namespacedSecrets" :config-maps="namespacedConfigMaps" :mode="mode" />
+            <Command
+              v-model="container"
+              :secrets="namespacedSecrets"
+              :config-maps="namespacedConfigMaps"
+              :mode="mode"
+              :loading="isLoadingSecondaryResources"
+            />
           </div>
           <ServiceNameSelect
             :value="podTemplateSpec.serviceAccountName"
@@ -148,6 +156,7 @@ export default {
             :select-placeholder="t('workload.serviceAccountName.label')"
             :options="namespacedServiceNames"
             option-label="metadata.name"
+            :loading="isLoadingSecondaryResources"
             @input="updateServiceAccount"
           />
 
@@ -167,6 +176,7 @@ export default {
             :config-maps="namespacedConfigMaps"
             :container="container"
             :save-pvc-hook-name="savePvcHookName"
+            :loading="isLoadingSecondaryResources"
             @removePvcForm="clearPvcFormState"
           />
         </Tab>
@@ -206,7 +216,7 @@ export default {
           <PodAffinity :mode="mode" :value="podTemplateSpec" :nodes="allNodeObjects" />
         </Tab>
         <Tab :label="t('workload.container.titles.nodeScheduling')" name="nodeScheduling" :weight="tabWeightMap['nodeScheduling']">
-          <NodeScheduling :mode="mode" :value="podTemplateSpec" :nodes="allNodes" />
+          <NodeScheduling :mode="mode" :value="podTemplateSpec" :nodes="allNodes" :loading="isLoadingSecondaryResources" />
         </Tab>
         <Tab :label="t('workload.container.titles.upgrading')" name="upgrading" :weight="tabWeightMap['upgrading']">
           <Job v-if="isJob || isCronJob" v-model="spec" :mode="mode" :type="type" />
