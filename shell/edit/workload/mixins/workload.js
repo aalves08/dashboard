@@ -530,16 +530,6 @@ export default {
         this.isLoadingSecondaryResources = true;
         const hash = await allHashSettled(requests);
 
-        this.isLoadingSecondaryResources = false;
-
-        const res = {};
-
-        Object.keys(hash).forEach((key) => {
-          if (hash[key].value) {
-            res[key] = hash[key].value.data ? hash[key].value.data.length : hash[key].value.items ? hash[key].value.items.length : 0;
-          }
-        });
-
         this.servicesOwned = hash.services ? await this.value.getServicesOwned() : [];
 
         // this.allSecrets = secrets.map(x => this.$store.dispatch(`cluster/create`, x)) || [];
@@ -551,6 +541,8 @@ export default {
         this.headlessServices = this.allServices.filter(service => service.spec.clusterIP === 'None');
         this.pvcs = hash.pvcs.value ? hash.pvcs.value.items : [];
         this.namespacedServiceNames = hash.sas.value ? hash.sas.value.items : [];
+
+        this.isLoadingSecondaryResources = false;
       }
     },
     addContainerBtn() {
