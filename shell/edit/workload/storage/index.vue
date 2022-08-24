@@ -55,6 +55,10 @@ export default {
       type:    Array,
       default: () => [],
     },
+    namespacedPvcs: {
+      type:    Array,
+      default: () => [],
+    },
 
     registerBeforeHook: {
       type:    Function,
@@ -66,32 +70,15 @@ export default {
     },
   },
 
-  async fetch() {
-    if ( this.$store.getters['cluster/schemaFor'](PVC) ) {
-      this.pvcs = await this.$store.dispatch('cluster/findAll', { type: PVC });
-    } else {
-      this.pvcs = [];
-    }
-  },
-
   data() {
     this.initializeStorage();
 
-    return {
-      pvcs:           [],
-      storageVolumes: this.getStorageVolumes(),
-    };
+    return { storageVolumes: this.getStorageVolumes() };
   },
 
   computed: {
     isView() {
       return this.mode === _VIEW;
-    },
-
-    namespacedPVCs() {
-      const namespace = this.namespace || this.$store.getters['defaultNamespace'];
-
-      return this.pvcs.filter(pvc => pvc.metadata.namespace === namespace);
     },
 
     /**
@@ -125,7 +112,7 @@ export default {
     },
 
     pvcNames() {
-      return this.namespacedPVCs.map(pvc => pvc.metadata.name);
+      return this.namespacedPvcs.map(pvc => pvc.metadata.name);
     },
   },
 
