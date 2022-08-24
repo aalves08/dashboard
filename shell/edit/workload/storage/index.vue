@@ -1,5 +1,4 @@
 <script>
-import { PVC } from '@shell/config/types';
 import { removeObjects, addObjects } from '@shell/utils/array';
 import ButtonDropdown from '@shell/components/ButtonDropdown';
 import Mount from '@shell/edit/workload/storage/Mount';
