@@ -753,7 +753,7 @@ export default {
               v-if="list.length === 0"
               :vertical="true"
               :subtle="true"
-              icon="icon-extension"
+              icon="icon-extensions"
               :message="emptyMessage"
             />
             <template v-else>
