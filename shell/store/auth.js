@@ -409,6 +409,7 @@ export const actions = {
 
       // Single-sign logout for SAML providers that allow for it
       if (res.baseType === 'samlConfigLogoutOutput' && res.idpRedirectUrl) {
+        console.error('SLO REDIRECT here...', res.idpRedirectUrl);
         window.location.href = res.idpRedirectUrl;
 
         return;
