@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   test:
-    uses: aalves08/dashboard/.github/workflows/customer-deploy.yaml@12032-reusable-wf-tests
+    uses: aalves08/dashboard/.github/workflows/build-extension-charts.yaml@12032-reusable-wf-tests
     permissions:
       actions: write
       contents: write
