@@ -1,7 +1,7 @@
 name: Test Extension workflows
 
 on:
-  workflow_dispatch: # to be removed for PROD
+  workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
 
