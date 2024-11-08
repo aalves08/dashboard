@@ -40,10 +40,10 @@ jobs:
           { org: 'aalves08', name: 'build-extension-charts', target_branch: 'gh-pages', tagged_release: 'clock-0.3.2',  is_test: 'true', test_repo: 'ui-plugin-examples', test_branch: 'main' }
         ]
         # branch: ['master']
-        branch: ['12032-reusable-wf-tests']
+        branch: [['12032-reusable-wf-tests']]
     # uses: rancher/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
-    name: ${{ matrix.workflows.name }}-${{ matrix.branch }}
-    uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
+    name: Running ${{ matrix.workflows.name }} - ${{ matrix.branch[0] }}
+    uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch[0] }}
     permissions:
       actions: write
       contents: write
