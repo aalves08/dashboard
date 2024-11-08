@@ -13,7 +13,7 @@ defaults:
     working-directory: ./
 
 jobs:
-  test:
+  test-build-extension-charts:
     uses: aalves08/dashboard/.github/workflows/build-extension-charts.yml@12032-reusable-wf-tests-2
     permissions:
       actions: write
@@ -26,3 +26,18 @@ jobs:
       is_test:  'true'
       test_repo: 'ui-plugin-examples'
       test_branch:  'main'
+  test-build-extension-catalog:
+    uses: aalves08/dashboard/.github/workflows/build-extension-catalog.yml@12032-reusable-wf-tests-2
+    permissions:
+      actions: write
+      contents: read
+      packages: write
+    with:
+      registry_target: ghcr.io
+      registry_user: ${{ github.actor }}
+      tagged_release:  'ui-plugin-examples-0.1.0'
+      is_test:  'true'
+      test_repo: 'ui-plugin-examples'
+      test_branch:  'main'
+    secrets: 
+      registry_token: ${{ secrets.GITHUB_TOKEN }}

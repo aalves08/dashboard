@@ -90,7 +90,7 @@ jobs:
             publish="$publish -t ${{ inputs.tagged_release }}"
           fi
 
-          if [[ -n "${{ inputs.is_test }}" ]]; then
+          if [[ "${{ inputs.is_test }}" == "true" ]]; then
             publish="$publish -f"
           fi
 
