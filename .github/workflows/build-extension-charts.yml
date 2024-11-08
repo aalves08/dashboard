@@ -14,7 +14,7 @@ on:
         type: string
       test_repo:
         required: false
-        type: string
+        type: boolean
       test_branch:
         required: false
         type: string
@@ -36,7 +36,7 @@ jobs:
       actions: write
       contents: read
     steps:
-      - if: is_test == 'true'
+      - if: is_test == true
         name: Checkout (test flow)
         uses: actions/checkout@v4
         with:
@@ -44,7 +44,7 @@ jobs:
           ref: ${{ inputs.test_branch }}
           fetch-depth: 0
       
-      - if: is_test != 'true'
+      - if: is_test != true
         name: Checkout (normal flow)
         uses: actions/checkout@v4
         with:
@@ -101,7 +101,7 @@ jobs:
 
   release:
     name: Release Build
-    if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test != 'true'
+    if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test != true
     needs: build-extension-artifact
     runs-on: ubuntu-latest
     permissions:
