@@ -4,10 +4,19 @@ on:
   workflow_dispatch: # to be removed for PROD
   # schedule:
   #   - cron: "0 0 * * *"
-
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+    
 jobs:
   test:
     uses: 'aalves08/dashboard/.github/workflows/customer-deploy.yaml@12032-reusable-wf-tests'
+    permissions:
+      actions: write
+      contents: write
+      deployments: write
+      pages: write
     with:
       target_branch: gh-pages
       tagged_release:  clock-0.3.2
