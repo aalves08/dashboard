@@ -23,12 +23,12 @@ jobs:
       # TODO: this step is only for debug purposes... to be deleted
       - name: Echo some variables
         run: |
-          echo "github.repository_owner ::: ${github.repository_owner}"
-          echo "github.repository ::: ${github.repository}"
-          echo "github.event_name ::: ${github.event_name}"
-          echo "github.event.ref ::: ${github.event.ref}"
-          echo "github.ref_name ::: ${github.ref_name}"
-          echo "inputs.tag ::: ${inputs.tag}"
+          echo "github.repository_owner ::: ${{github.repository_owner}}"
+          echo "github.repository ::: ${{github.repository}}"
+          echo "github.event_name ::: ${{github.event_name}}"
+          echo "github.event.ref ::: ${{github.event}.ref}"
+          echo "github.ref_name ::: ${{github.ref_name}}"
+          echo "inputs.tag ::: ${{inputs.tag}}"
       # - uses: actions/checkout@v3
       #   with:
       #     fetch-depth: 0
