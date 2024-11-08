@@ -1,10 +1,9 @@
 name: Test Extension workflows
 
 on:
-  workflow_dispatch:
-  # push:
-  #   branches:
-  #     - 12032-reusable-wf-tests-2
+  push:
+    branches:
+      - 12032-reusable-wf-tests-2
   schedule:
     - cron: "0 0 * * *"
 
