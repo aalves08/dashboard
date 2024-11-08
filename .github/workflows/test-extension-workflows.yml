@@ -45,7 +45,7 @@ jobs:
       registry_token: ${{ secrets.GITHUB_TOKEN }}
   # test releasing shell package
   test-release-shell-pkg:
-    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yml@12032-reusable-wf-tests-2
+    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       tag: shell-pkg-v3.0.0
   # test releasing creators package
