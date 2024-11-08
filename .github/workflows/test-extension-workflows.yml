@@ -4,15 +4,16 @@ on:
   push:
     branches:
       - 12032-reusable-wf-tests-2
-  schedule:
-    - cron: "0 0 * * *"
+  # schedule:
+  #   - cron: "0 0 * * *"
 
 defaults:
   run:
     shell: bash
     working-directory: ./
-
+# TODO: get latest versions from each branch for shell + creators + get version of latest clock and ui-plugin-examples root package.json version
 jobs:
+  # test building helm chart
   test-build-extension-charts:
     uses: aalves08/dashboard/.github/workflows/build-extension-charts.yml@12032-reusable-wf-tests-2
     permissions:
@@ -26,6 +27,7 @@ jobs:
       is_test:  'true'
       test_repo: 'ui-plugin-examples'
       test_branch:  'main'
+  # test building catalog image
   test-build-extension-catalog:
     uses: aalves08/dashboard/.github/workflows/build-extension-catalog.yml@12032-reusable-wf-tests-2
     permissions:
@@ -41,3 +43,13 @@ jobs:
       test_branch:  'main'
     secrets: 
       registry_token: ${{ secrets.GITHUB_TOKEN }}
+  # test releasing shell package
+  test-release-shell-pkg:
+    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yml@12032-reusable-wf-tests-2
+    with:
+      tag: shell-pkg-v3.0.0
+  # test releasing creators package
+  test-release-creators-pkg:
+    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yml@12032-reusable-wf-tests-2
+    with:
+      tag: creators-pkg-v1.0.0

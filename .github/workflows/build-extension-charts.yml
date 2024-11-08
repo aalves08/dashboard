@@ -97,15 +97,15 @@ jobs:
           $publish
 
       - name: Upload charts artifact
-        if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test == 'true'
+        if: github.ref_type == 'tag' || github.event_name != 'pull_request' || inputs.is_test == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: charts
           path: tmp
-
+## if test, check if artifacts are there...
   release:
     name: Release Build
-    if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test != 'true'
+    if: github.ref_type == 'tag' || github.event_name != 'pull_request' || inputs.is_test != 'true'
     needs: build-extension-artifact
     runs-on: ubuntu-latest
     permissions:

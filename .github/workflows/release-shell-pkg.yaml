@@ -5,59 +5,75 @@ on:
     tags:
       - 'shell-pkg-v*'
       - 'creators-pkg-v*'
+  workflow_call:
+    inputs:
+      tag:
+        required: false
+        type: string
 
 jobs:
+  
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    if: github.repository_owner == 'aalves08' && github.repository == 'dashboard' && (github.event_name == 'workflow_call' || (github.event_name == 'push' && github.event.ref == 'refs/tags/${{ github.ref_name }}'))
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'yarn'
-
-      - name: Check Tags Version Matching
-        env:
-          TAG: ${{github.ref_name}}
-        run: ./.github/workflows/scripts/check-package-tag-version.sh
-        shell: bash
-
-      - name: Validate Plugin build system
-        run: ./shell/scripts/test-plugins-build.sh
-        shell: bash
-
-      # Reset the local (ci) repository state because
-      # The previous step (Validate Plugin build system) changes
-      # the version number on package.json for Shell in order
-      # to release it in verdaccio for it's tests
-      - name: Reset repository (file system)
+      # TODO: this step is only for debug purposes... to be deleted
+      - name: Echo some variables
         run: |
-          git reset --hard HEAD
-          echo $NPM_REGISTRY
-          cat ./shell/package.json
+          echo "github.repository_owner ::: ${github.repository_owner}"
+          echo "github.repository ::: ${github.repository}"
+          echo "github.event_name ::: ${github.event_name}"
+          echo "github.event.ref ::: ${github.event.ref}"
+          echo "github.ref_name ::: ${github.ref_name}"
+          echo "inputs.tag ::: ${inputs.tag}"
+      # - uses: actions/checkout@v3
+      #   with:
+      #     fetch-depth: 0
+      #     persist-credentials: false
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@rancher'
+      # - name: Enable Corepack
+      #   run: corepack enable
 
-      - name: Install packages
-        run: yarn install --frozen-lockfile
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version-file: '.nvmrc'
+      #     cache: 'yarn'
 
-      - name: Publish Shell Package to npm
-        run: ./shell/scripts/publish-shell.sh --npm
-        env:
-          TAG: ${{github.ref_name}}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # - name: Check Tags Version Matching
+      #   env:
+      #     TAG: ${{ inputs.tag || github.ref_name }}
+      #   run: ./.github/workflows/scripts/check-package-tag-version.sh
+      #   shell: bash
+
+      # - name: Validate Plugin build system
+      #   run: ./shell/scripts/test-plugins-build.sh
+      #   shell: bash
+
+      # # Reset the local (ci) repository state because
+      # # The previous step (Validate Plugin build system) changes
+      # # the version number on package.json for Shell in order
+      # # to release it in verdaccio for it's tests
+      # - name: Reset repository (file system)
+      #   run: |
+      #     git reset --hard HEAD
+      #     echo $NPM_REGISTRY
+      #     cat ./shell/package.json
+
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version-file: '.nvmrc'
+      #     registry-url: 'https://registry.npmjs.org'
+      #     scope: '@rancher'
+
+      # - name: Install packages
+      #   run: yarn install --frozen-lockfile
+
+      # - name: Publish Shell Package to npm
+      #   run: ./shell/scripts/publish-shell.sh --npm
+      #   env:
+      #     TAG: ${{ inputs.tag || github.ref_name }}
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

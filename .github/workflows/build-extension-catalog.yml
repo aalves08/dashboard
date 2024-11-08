@@ -28,7 +28,7 @@ on:
 jobs:
   build-extension-catalog:
     name: Build container image
-    if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test == 'true'
+    if: github.ref_type == 'tag' || github.event_name != 'pull_request' || inputs.is_test == 'true'
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -86,14 +86,16 @@ jobs:
 
       - name: Build and push UI image
         run: |
-          publish="yarn publish-pkgs -c -r ${{ inputs.registry_target }} -o ${{ github.repository_owner }}"
-
-          if [[ -n "${{ inputs.tagged_release }}" ]]; then
-            publish="$publish -t ${{ inputs.tagged_release }}"
-          fi
+          publish="yarn publish-pkgs -c"
 
           if [[ "${{ inputs.is_test }}" != "true" ]]; then
             publish="$publish -p"
+          fi
+
+          publish="$publish -r ${{ inputs.registry_target }} -o ${{ github.repository_owner }}"
+
+          if [[ -n "${{ inputs.tagged_release }}" ]]; then
+            publish="$publish -t ${{ inputs.tagged_release }}"
           fi
 
           $publish
