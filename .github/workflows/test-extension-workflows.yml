@@ -42,34 +42,38 @@ jobs:
         # branch: ['master']
         branch: ['12032-reusable-wf-tests']
     # uses: rancher/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
-    # name: Running ${{ matrix.workflows.name }} - ${{ matrix.branch }}
+    name: Running ${{ matrix.workflows.name }} - ${{ matrix.branch }}
     # uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
-    # permissions:
-    #   actions: write
-    #   contents: write
-    #   deployments: write
-    #   pages: write
-    # with:
-    #   target_branch: ${{ matrix.workflows.target_branch }}
-    #   tagged_release:  ${{ matrix.workflows.tagged_release }}
-    #   is_test:  ${{ matrix.workflows.is_test }}
-    #   test_repo:  ${{ matrix.workflows.test_repo }}
-    #   test_branch:  ${{ matrix.workflows.test_branch }}
+    uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml12032-reusable-wf-tests
+    permissions:
+      actions: write
+      contents: write
+      deployments: write
+      pages: write
+    with:
+      target_branch: ${{ matrix.workflows.target_branch }}
+      tagged_release:  ${{ matrix.workflows.tagged_release }}
+      is_test:  ${{ matrix.workflows.is_test }}
+      test_repo:  ${{ matrix.workflows.test_repo }}
+      test_branch:  ${{ matrix.workflows.test_branch }}
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Running ${{ matrix.workflows.name }} - ${{ matrix.branch }}
-        uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
-        # permissions:
-        #   actions: write
-        #   contents: write
-        #   deployments: write
-        #   pages: write
-        with:
-          target_branch: ${{ matrix.workflows.target_branch }}
-          tagged_release:  ${{ matrix.workflows.tagged_release }}
-          is_test:  ${{ matrix.workflows.is_test }}
-          test_repo:  ${{ matrix.workflows.test_repo }}
-          test_branch:  ${{ matrix.workflows.test_branch }}
+    ### Reusable workflows cannot be used in steps!!!! ###
+    ### this won't work! ###
+    ###
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - name: Running ${{ matrix.workflows.name }} - ${{ matrix.branch }}
+    #     uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
+    #     permissions:
+    #       actions: write
+    #       contents: write
+    #       deployments: write
+    #       pages: write
+    #     with:
+    #       target_branch: ${{ matrix.workflows.target_branch }}
+    #       tagged_release:  ${{ matrix.workflows.tagged_release }}
+    #       is_test:  ${{ matrix.workflows.is_test }}
+    #       test_repo:  ${{ matrix.workflows.test_repo }}
+    #       test_branch:  ${{ matrix.workflows.test_branch }}
 
 
