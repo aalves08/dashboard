@@ -90,6 +90,10 @@ jobs:
             publish="$publish -t ${{ inputs.tagged_release }}"
           fi
 
+          if [[ -n "${{ inputs.is_test }}" ]]; then
+            publish="$publish -f"
+          fi
+
           $publish
 
       - name: Upload charts artifact
