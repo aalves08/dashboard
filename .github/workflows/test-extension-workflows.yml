@@ -42,7 +42,7 @@ jobs:
         # branch: ['master']
         branch: ['12032-reusable-wf-tests']
     # uses: rancher/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
-    name: Running ${{ matrix.workflows.name }} - ${{ matrix.branch }}
+    name: ${{ matrix.workflows.name }}-${{ matrix.branch }}
     uses: ${{ matrix.workflows.org }}/dashboard/.github/workflows/${{ matrix.workflows.name }}.yml@${{ matrix.branch }}
     permissions:
       actions: write
