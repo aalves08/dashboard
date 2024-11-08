@@ -35,7 +35,7 @@ jobs:
           echo "github.ref_name ::: ${{github.ref_name}}"
           echo "inputs.tag ::: ${{inputs.tag}}"
 
-      - if: input.is_test == 'true' && inputs.test_branch != ''
+      - if: inputs.is_test == 'true' && inputs.test_branch != ''
         name: Checkout (test flow)
         uses: actions/checkout@v3
         with:
