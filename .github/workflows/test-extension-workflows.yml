@@ -22,8 +22,8 @@ jobs:
       deployments: write
       pages: write
     with:
-      target_branch: gh-pages
-      tagged_release:  clock-0.3.2
-      is_test:  true
-      test_repo: ui-plugin-examples
-      test_branch:  main
+      target_branch: "gh-pages"
+      tagged_release:  "clock-0.3.2"
+      is_test:  "true"
+      test_repo: "ui-plugin-examples"
+      test_branch:  "main"
