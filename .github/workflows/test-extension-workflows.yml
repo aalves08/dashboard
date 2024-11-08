@@ -47,9 +47,13 @@ jobs:
   test-release-shell-pkg:
     uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
+      is_test:  'true'
+      test_branch:  'master'
       tag: shell-pkg-v3.0.0
   # test releasing creators package
   test-release-creators-pkg:
     uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
+      is_test: 'true'
+      test_branch: 'master'
       tag: creators-pkg-v1.0.0
