@@ -50,6 +50,6 @@ jobs:
       tag: shell-pkg-v3.0.0
   # test releasing creators package
   test-release-creators-pkg:
-    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yml@12032-reusable-wf-tests-2
+    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       tag: creators-pkg-v1.0.0
