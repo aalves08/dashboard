@@ -73,7 +73,7 @@ jobs:
         run: yarn
 
       - name: Parse Extension Name
-        if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag' || inputs.inputs.is_test == 'true'
         id: parsed-name
         env:
           GH_TOKEN: ${{ github.token }}
@@ -97,7 +97,7 @@ jobs:
           $publish
 
       - name: Upload charts artifact
-        if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request')
+        if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.inputs.is_test == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: charts
