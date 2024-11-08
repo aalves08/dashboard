@@ -9,7 +9,7 @@ on:
       tagged_release:
         required: true
         type: string
-      inputs.is_test:
+      is_test:
         required: false
         type: string
       test_repo:
