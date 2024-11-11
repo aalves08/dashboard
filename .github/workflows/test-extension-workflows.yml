@@ -54,6 +54,7 @@ jobs:
 
       - name: Retrieve Shell and Creators versions
         run: source ./shell/scripts/retrieve-versions.sh
+        id: retrieve-data
         shell: bash
         # run: |
         #   SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -75,7 +76,7 @@ jobs:
     with:
       is_test:  'true'
       test_branch:  '12032-reusable-wf-tests-2'
-      tag: ${{ needs.retrieve-shell-creators-versions.outputs.SHELL_VERSION_TAG }}
+      tag: ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}
   # test-release-shell-pkg:
   #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
   #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
