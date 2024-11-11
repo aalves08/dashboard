@@ -16,12 +16,12 @@ function generate_tag_export() {
   case $NAME in
     "shell")
       SHELL_V=$(jq -r .version ${SHELL_DIR}/package.json)
-      echo "SHELL_VERSION_TAG=shell-pkg-v$SHELL_V" >> $GITHUB_ENV
+      echo "SHELL_VERSION_TAG=shell-pkg-v$SHELL_V" >> $GITHUB_OUTPUT
       echo "Shell version retrieved ::: ${SHELL_V}"
       ;;
     "creators")
       CREATORS_V=$(jq -r .version ${CREATORS_DIR}/package.json)
-      echo "CREATORS_VERSION_TAG=creators-pkg-v$CREATORS_V" >> $GITHUB_ENV
+      echo "CREATORS_VERSION_TAG=creators-pkg-v$CREATORS_V" >> $GITHUB_OUTPUT
       echo "Creators version retrieved ::: ${CREATORS_V}"
       ;;
   esac
