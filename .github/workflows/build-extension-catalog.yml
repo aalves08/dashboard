@@ -15,10 +15,10 @@ on:
       is_test:
         required: false
         type: string
-      test_repo:
+      test_ext_repo:
         required: false
         type: string
-      test_branch:
+      test_ext_branch:
         required: false
         type: string
     secrets:
@@ -40,8 +40,8 @@ jobs:
         name: Checkout repository (test flow)
         uses: actions/checkout@v4
         with:
-          repository: rancher/${{ inputs.test_repo }}
-          ref: ${{ inputs.test_branch }}
+          repository: rancher/${{ inputs.test_ext_repo }}
+          ref: ${{ inputs.test_ext_branch }}
       
       - if: inputs.is_test != 'true'
         name: Checkout repository (normal flow)

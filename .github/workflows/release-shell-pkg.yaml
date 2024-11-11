@@ -24,6 +24,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # TODO: replace "aalves08"
     if: github.repository == 'aalves08/dashboard' && (github.event_name == 'workflow_call' || (github.event_name == 'push' && github.event.ref == 'refs/tags/${{ github.ref_name }}'))
     steps:
       - if: inputs.is_test == 'true' && inputs.test_branch != ''
@@ -56,10 +57,9 @@ jobs:
         run: ./.github/workflows/scripts/check-package-tag-version.sh
         shell: bash
 
-      # TODO: Re-enable this step before completing PR
-      # - name: Validate Plugin build system
-      #   run: ./shell/scripts/test-plugins-build.sh
-      #   shell: bash
+      - name: Validate Plugin build system
+        run: ./shell/scripts/test-plugins-build.sh
+        shell: bash
 
       # Reset the local (ci) repository state because
       # The previous step (Validate Plugin build system) changes
