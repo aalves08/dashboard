@@ -50,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       SHELL_VERSION_TAG: ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}
+      CREATORS_VERSION_TAG: ${{ steps.retrieve-data.outputs.CREATORS_VERSION_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
