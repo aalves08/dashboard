@@ -27,5 +27,5 @@ function generate_tag_export() {
   esac
 }
 
-generate_version_export "shell"
-generate_version_export "creators"
+generate_tag_export "shell"
+generate_tag_export "creators"
