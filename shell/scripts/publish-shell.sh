@@ -50,6 +50,11 @@ function publish() {
     PUBLISH_ARGS="--no-git-tag-version --access public --registry $NPM_REGISTRY --tag pre-release"
   fi
 
+  # when testing the workflow, we don't want to actually do an npm publish but only a dry run
+  if [ ${DRY_RUN} == "true" ]; then
+    PUBLISH_ARGS="--no-git-tag-version --access public --registry $NPM_REGISTRY --tag pre-release --dry-run"
+  fi
+
   echo "Publishing ${NAME} from ${FOLDER}"
   pushd ${FOLDER} >/dev/null
 

@@ -13,47 +13,51 @@ defaults:
     working-directory: ./
 # TODO: get latest versions from each branch for shell + creators + get version of latest clock and ui-plugin-examples root package.json version
 jobs:
-  # test building helm chart
-  test-build-extension-charts:
-    uses: aalves08/dashboard/.github/workflows/build-extension-charts.yml@12032-reusable-wf-tests-2
-    permissions:
-      actions: write
-      contents: write
-      deployments: write
-      pages: write
-    with:
-      target_branch: 'gh-pages'
-      tagged_release:  'clock-0.3.2'
-      is_test:  'true'
-      test_repo: 'ui-plugin-examples'
-      test_branch:  'main'
-  # test building catalog image
-  test-build-extension-catalog:
-    uses: aalves08/dashboard/.github/workflows/build-extension-catalog.yml@12032-reusable-wf-tests-2
-    permissions:
-      actions: write
-      contents: read
-      packages: write
-    with:
-      registry_target: ghcr.io
-      registry_user: ${{ github.actor }}
-      tagged_release:  'ui-plugin-examples-0.1.0'
-      is_test:  'true'
-      test_repo: 'ui-plugin-examples'
-      test_branch:  'main'
-    secrets: 
-      registry_token: ${{ secrets.GITHUB_TOKEN }}
-  # test releasing shell package
+  ### test building helm chart for an extension
+  # test-build-extension-charts:
+  #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses"
+  #   uses: aalves08/dashboard/.github/workflows/build-extension-charts.yml@12032-reusable-wf-tests-2
+  #   permissions:
+  #     actions: write
+  #     contents: write
+  #     deployments: write
+  #     pages: write
+  #   with:
+  #     target_branch: 'gh-pages'
+  #     tagged_release:  'clock-0.3.2'
+  #     is_test:  'true'
+  #     test_repo: 'ui-plugin-examples'
+  #     test_branch:  'main'
+  # ### test building catalog image for extensions
+  # test-build-extension-catalog:
+  #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses"
+  #   uses: aalves08/dashboard/.github/workflows/build-extension-catalog.yml@12032-reusable-wf-tests-2
+  #   permissions:
+  #     actions: write
+  #     contents: read
+  #     packages: write
+  #   with:
+  #     registry_target: ghcr.io
+  #     registry_user: ${{ github.actor }}
+  #     tagged_release:  'ui-plugin-examples-0.1.0'
+  #     is_test:  'true'
+  #     test_repo: 'ui-plugin-examples'
+  #     test_branch:  'main'
+  #   secrets: 
+  #     registry_token: ${{ secrets.GITHUB_TOKEN }}
+  ### test releasing shell package
   test-release-shell-pkg:
+    # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
     uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       is_test:  'true'
       test_branch:  'master'
       tag: shell-pkg-v3.0.0
-  # test releasing creators package
-  test-release-creators-pkg:
-    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
-    with:
-      is_test: 'true'
-      test_branch: 'master'
-      tag: creators-pkg-v1.0.0
+  ### test releasing creators package
+  # test-release-creators-pkg:
+  #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
+  #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
+  #   with:
+  #     is_test: 'true'
+  #     test_branch: 'master'
+  #     tag: creators-pkg-v1.0.0

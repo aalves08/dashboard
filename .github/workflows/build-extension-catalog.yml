@@ -28,7 +28,7 @@ on:
 jobs:
   build-extension-catalog:
     name: Build container image
-    if: github.ref_type == 'tag' || github.event_name != 'pull_request' || inputs.is_test == 'true'
+    if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test == 'true'
     runs-on: ubuntu-latest
     permissions:
       actions: write
