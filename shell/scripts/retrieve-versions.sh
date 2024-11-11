@@ -16,12 +16,12 @@ function generate_version_export() {
   case $NAME in
     "shell")
       SHELL_V=$(jq -r .version ${SHELL_DIR}/package.json)
-      echo "SHELL_VERSION=$SHELL_V" >> $GITHUB_ENV
+      echo "SHELL_VERSION=$SHELL_V" >> "$GITHUB_ENV"
       echo "Shell version retrieved ::: ${SHELL_V}"
       ;;
     "creators")
       CREATORS_V=$(jq -r .version ${CREATORS_DIR}/package.json)
-      echo "CREATORS_VERSION=$CREATORS_V" >> $GITHUB_ENV
+      echo "CREATORS_VERSION=$CREATORS_V" >> "$GITHUB_ENV"
       echo "Creators version retrieved ::: ${CREATORS_V}"
       ;;
   esac
