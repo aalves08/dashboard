@@ -46,7 +46,7 @@ jobs:
   #   secrets: 
   #     registry_token: ${{ secrets.GITHUB_TOKEN }}
   # ### test releasing shell package
-  retrieve-shell-creators-versions:
+  retrieve-shell-creators-versions-12032-reusable-wf-tests-2:
     runs-on: ubuntu-latest
     outputs:
       SHELL_VERSION_TAG: ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}
@@ -58,26 +58,20 @@ jobs:
         run: source ./shell/scripts/retrieve-versions.sh
         id: retrieve-data
         shell: bash
-        # run: |
-        #   SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-        #   BASE_DIR="$(
-        #     cd $SCRIPT_DIR && cd ../.. &
-        #     pwd
-        #   )"
-        #   SHELL_DIR=$BASE_DIR/shell
-        #   SHELL_V=$(jq -r .version ${SHELL_DIR}/package.json)
-        #   echo "SHELL_VERSION_TAG=shell-pkg-v$SHELL_V" >> $GITHUB_OUTPUT
-
-      - name: Echoing variables
-        run: echo "shell var echo - ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}" && echo "shell var echo - $CREATORS_VERSION_TAG"
-        shell: bash
   test-release-shell-pkg-master:
-    needs: retrieve-shell-creators-versions
+    needs: retrieve-shell-creators-versions-12032-reusable-wf-tests-2
     uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       is_test:  'true'
       test_branch:  '12032-reusable-wf-tests-2'
-      tag: ${{ needs.retrieve-shell-creators-versions.outputs.SHELL_VERSION_TAG }}
+      tag: ${{ needs.retrieve-shell-creators-versions-12032-reusable-wf-tests-2.outputs.SHELL_VERSION_TAG }}
+  test-release-creators-pkg:
+    needs: retrieve-shell-creators-versions-12032-reusable-wf-tests-2
+    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
+    with:
+      is_test: 'true'
+      test_branch: '12032-reusable-wf-tests-2'
+      tag: ${{ needs.retrieve-shell-creators-versions-12032-reusable-wf-tests-2.outputs.CREATORS_VERSION_TAG }}
   # test-release-shell-pkg:
   #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
   #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
