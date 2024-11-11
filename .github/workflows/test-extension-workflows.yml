@@ -13,20 +13,6 @@ defaults:
     working-directory: ./
 # TODO: get latest versions from each branch for shell + creators + get version of latest clock and ui-plugin-examples root package.json version
 jobs:
-  get-versions:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          ref: "12032-reusable-wf-tests-2"
-
-      - name: Run Bash script
-        run: ./shell/scripts/retrieve-versions.sh
-        shell: bash
-        env:
-          BRANCH: "master"
   # ### test building helm chart for an extension
   # test-build-extension-charts:
   #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses"
@@ -60,6 +46,28 @@ jobs:
   #   secrets: 
   #     registry_token: ${{ secrets.GITHUB_TOKEN }}
   # ### test releasing shell package
+  test-release-shell-pkg-master:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Retrieve Shell and Creators versions
+        run: source ./shell/scripts/retrieve-versions.sh
+        shell: bash
+
+      - name: Echoing variables
+        run: echo $SHELL_VERSION && echo CREATORS_VERSION
+        shell: bash
+
+      - name: "Test release Shell package - master"
+        uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
+        with:
+          is_test:  'true'
+          test_branch:  '12032-reusable-wf-tests-2'
+          tag: shell-pkg-v${{ env.SHELL_VERSION }}
   # test-release-shell-pkg:
   #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
   #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
