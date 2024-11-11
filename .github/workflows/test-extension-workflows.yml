@@ -57,7 +57,7 @@ jobs:
         shell: bash
 
       - name: Echoing variables
-        run: echo "shell var echo - ${{ env.SHELL_VERSION }}" && echo "shell var echo - ${{ env.CREATORS_VERSION }}"
+        run: echo "shell var echo - $SHELL_VERSION" && echo "shell var echo - $CREATORS_VERSION"
         shell: bash
   test-release-shell-pkg-master:
     needs: retrieve-shell-creators-versions
@@ -65,7 +65,7 @@ jobs:
     with:
       is_test:  'true'
       test_branch:  '12032-reusable-wf-tests-2'
-      tag: 'shell-pkg-v${{ env.SHELL_VERSION }}'
+      tag: 'shell-pkg-v$SHELL_VERSION'
   # test-release-shell-pkg:
   #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
   #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
