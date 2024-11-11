@@ -46,11 +46,13 @@ jobs:
   #   secrets: 
   #     registry_token: ${{ secrets.GITHUB_TOKEN }}
   # ### test releasing shell package
-  retrieve-shell-creators-versions-12032-reusable-wf-tests-2:
+  retrieve-tags-master:
     runs-on: ubuntu-latest
     outputs:
-      SHELL_VERSION_TAG: ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}
-      CREATORS_VERSION_TAG: ${{ steps.retrieve-data.outputs.CREATORS_VERSION_TAG }}
+      SHELL_TAG: ${{ steps.retrieve-data.outputs.SHELL_TAG }}
+      CREATORS_TAG: ${{ steps.retrieve-data.outputs.CREATORS_TAG }}
+      ECI_TAG: ${{ steps.retrieve-data.outputs.ECI_TAG }}
+      EXTENSIONS_TAG: ${{ steps.retrieve-data.outputs.EXTENSIONS_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -59,20 +61,50 @@ jobs:
         run: source ./shell/scripts/retrieve-versions.sh
         id: retrieve-data
         shell: bash
+  test-build-extension-charts:
+    needs: retrieve-tags-master
+    uses: aalves08/dashboard/.github/workflows/build-extension-charts.yml@12032-reusable-wf-tests-2
+    permissions:
+      actions: write
+      contents: write
+      deployments: write
+      pages: write
+    with:
+      target_branch: 'gh-pages'
+      tagged_release:  ${{ needs.retrieve-tags-master.outputs.EXTENSIONS_TAG }}
+      is_test:  'true'
+      test_repo: 'ui-plugin-examples'
+      test_branch:  'main'
+  test-build-extension-catalog:
+    needs: retrieve-tags-master
+    uses: aalves08/dashboard/.github/workflows/build-extension-catalog.yml@12032-reusable-wf-tests-2
+    permissions:
+      actions: write
+      contents: read
+      packages: write
+    with:
+      registry_target: ghcr.io
+      registry_user: ${{ github.actor }}
+      tagged_release: ${{ needs.retrieve-tags-master.outputs.ECI_TAG }}
+      is_test:  'true'
+      test_repo: 'ui-plugin-examples'
+      test_branch:  'main'
+    secrets: 
+      registry_token: ${{ secrets.GITHUB_TOKEN }}
   test-release-shell-pkg-master:
-    needs: retrieve-shell-creators-versions-12032-reusable-wf-tests-2
+    needs: retrieve-tags-master
     uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       is_test:  'true'
       test_branch:  '12032-reusable-wf-tests-2'
-      tag: ${{ needs.retrieve-shell-creators-versions-12032-reusable-wf-tests-2.outputs.SHELL_VERSION_TAG }}
-  test-release-creators-pkg:
-    needs: retrieve-shell-creators-versions-12032-reusable-wf-tests-2
+      tag: ${{ needs.retrieve-tags-master.outputs.SHELL_TAG }}
+  test-release-creators-pkg-master:
+    needs: retrieve-tags-master
     uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       is_test: 'true'
       test_branch: '12032-reusable-wf-tests-2'
-      tag: ${{ needs.retrieve-shell-creators-versions-12032-reusable-wf-tests-2.outputs.CREATORS_VERSION_TAG }}
+      tag: ${{ needs.retrieve-tags-master.outputs.CREATORS_TAG }}
   # test-release-shell-pkg:
   #   # TODO: Create more tests for each branch (master, release-2.9, release-2.8) by setting correct branch on "uses" and "test_branch" (they need to be the same)
   #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
