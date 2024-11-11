@@ -40,4 +40,4 @@ echo "Retrieve current Shell version"
 generate_version_export "shell"
 generate_version_export "creators"
 
-# export RANCHER_VERSION_E2E=${{ matrix.rancherEnv[1] }}
+# export RANCHER_VERSION_E2E=${{ matrix.rancherEnv[1] }}#
