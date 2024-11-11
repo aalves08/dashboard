@@ -48,6 +48,8 @@ jobs:
   # ### test releasing shell package
   retrieve-shell-creators-versions:
     runs-on: ubuntu-latest
+    outputs:
+      SHELL_VERSION_TAG: ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -67,7 +69,7 @@ jobs:
           echo "SHELL_VERSION_TAG=shell-pkg-v$SHELL_V" >> $GITHUB_OUTPUT
 
       - name: Echoing variables
-        run: echo "shell var echo - $SHELL_VERSION_TAG" && echo "shell var echo - $CREATORS_VERSION_TAG"
+        run: echo "shell var echo - ${{ steps.retrieve-data.outputs.SHELL_VERSION_TAG }}" && echo "shell var echo - $CREATORS_VERSION_TAG"
         shell: bash
   test-release-shell-pkg-master:
     needs: retrieve-shell-creators-versions
