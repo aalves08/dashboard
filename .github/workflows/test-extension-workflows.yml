@@ -77,7 +77,8 @@ jobs:
   slack-message:
     if: always()
     runs-on: ubuntu-latest
-    needs: [retrieve-tags-master, test-build-extension-charts-master, test-build-extension-catalog-master, test-release-shell-pkg-master, test-release-creators-pkg-master]
+    # needs: [retrieve-tags-master, test-build-extension-charts-master, test-build-extension-catalog-master, test-release-shell-pkg-master, test-release-creators-pkg-master]
+    needs: [retrieve-tags-master, test-build-extension-charts-master, test-build-extension-catalog-master]
     # TODO: SLACK_WEBHOOK_URL_WORKFLOWS not SLACK_WEBHOOK_URL
     steps: 
       - name: Slack message for workflow success
