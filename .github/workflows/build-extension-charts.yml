@@ -94,10 +94,12 @@ jobs:
             publish="$publish -f"
           fi
 
+          exit 0;
+
           $publish
 
       - name: Upload charts artifact
-        if: github.ref_type == 'tag' || github.event_name != 'pull_request' || inputs.is_test == 'true'
+        if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: charts

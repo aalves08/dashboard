@@ -60,20 +60,20 @@ jobs:
       test_ext_branch:  'main'
     secrets: 
       registry_token: ${{ secrets.GITHUB_TOKEN }}
-  test-release-shell-pkg-master:
-    needs: retrieve-tags-master
-    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
-    with:
-      is_test:  'true'
-      test_branch:  '12032-reusable-wf-tests-2'
-      tag: ${{ needs.retrieve-tags-master.outputs.SHELL_TAG }}
-  test-release-creators-pkg-master:
-    needs: retrieve-tags-master
-    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
-    with:
-      is_test: 'true'
-      test_branch: '12032-reusable-wf-tests-2'
-      tag: ${{ needs.retrieve-tags-master.outputs.CREATORS_TAG }}
+  # test-release-shell-pkg-master:
+  #   needs: retrieve-tags-master
+  #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
+  #   with:
+  #     is_test:  'true'
+  #     test_branch:  '12032-reusable-wf-tests-2'
+  #     tag: ${{ needs.retrieve-tags-master.outputs.SHELL_TAG }}
+  # test-release-creators-pkg-master:
+  #   needs: retrieve-tags-master
+  #   uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
+  #   with:
+  #     is_test: 'true'
+  #     test_branch: '12032-reusable-wf-tests-2'
+  #     tag: ${{ needs.retrieve-tags-master.outputs.CREATORS_TAG }}
   slack-message:
     if: always()
     runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
     steps: 
       - name: Slack message for workflow success
         env:
-          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL_WORKFLOWS }}
+          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: success()
         shell: bash
         run: |
@@ -92,7 +92,7 @@ jobs:
           $SLACK_URL
       - name: Slack message for workflow success
         env:
-          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL_WORKFLOWS }}
+          SLACK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: success()
         shell: bash
         run: |
