@@ -16,6 +16,9 @@ jobs:
   get-versions:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Run Bash script
         run: ./shell/scripts/retrieve-versions.sh
         shell: bash
