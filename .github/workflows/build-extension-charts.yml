@@ -94,7 +94,7 @@ jobs:
             publish="$publish -f"
           fi
 
-          exit 0;
+          exit 1;
 
           $publish
 
