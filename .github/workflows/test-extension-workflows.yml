@@ -110,7 +110,7 @@ jobs:
           echo "failed ::: $failed"          
           
           curl -X POST -H 'Content-type: application/json; charset=utf-8' \
-          --data '{ branch: "master", message: "${{ succeeded_message }} ::: ${{ failed_message }}"}' $SLACK_WEBHOOK
+          --data '{ branch: "master", message: "$succeeded_message ::: $failed_message"}' $SLACK_WEBHOOK
 
       # - name: Slack message for workflow success
       #   env:
