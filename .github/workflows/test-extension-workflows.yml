@@ -91,8 +91,7 @@ jobs:
           succeeded=()
           failed=()
           for job in retrieve-tags-master test-build-extension-charts-master test-build-extension-catalog-master; do
-            result=${{ format('{{ job.outputs.result }}', job) }}
-            if [[ $result == 'success' ]]; then
+            if [[ ${{ format('{{ job.status == ''success'' }}', job) }} == 'true' ]]; then
               succeeded+=("$job")
             else
               failed+=("$job")
