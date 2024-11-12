@@ -55,6 +55,7 @@ jobs:
 
       - name: Configure Git
         run: |
+          exit 1;
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
@@ -93,8 +94,6 @@ jobs:
           if [[ "${{ inputs.is_test }}" == "true" ]]; then
             publish="$publish -f"
           fi
-
-          exit 1;
 
           $publish
 

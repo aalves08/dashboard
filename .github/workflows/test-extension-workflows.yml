@@ -75,6 +75,7 @@ jobs:
   #     is_test: 'true'
   #     test_branch: '12032-reusable-wf-tests-2'
   #     tag: ${{ needs.retrieve-tags-master.outputs.CREATORS_TAG }}
+
   slack-message:
     if: ${{ always() }}
     runs-on: ubuntu-latest
@@ -91,7 +92,7 @@ jobs:
           succeeded=()
           failed=()
           for job in "retrieve-tags-master" "test-build-extension-charts-master" "test-build-extension-catalog-master"; do
-            if [[ ${{ format('{{ job.status == ''success'' }}', job) }} == 'true' ]]; then
+            if [[ ${{ format('{{ job.status == "success" }}', job) }} == "true" ]]; then
               succeeded+=("$job")
             else
               failed+=("$job")
