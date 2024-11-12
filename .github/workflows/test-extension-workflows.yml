@@ -98,9 +98,6 @@ jobs:
             fi
           done
 
-          succeeded_message=""
-          failed_message=""
-          
           if [[ -n "${succeeded[*]}" ]]; then
             succeeded_message="✅ The following jobs succeeded:\n${succeeded[*]}"
           fi
@@ -109,8 +106,8 @@ jobs:
             failed_message="❌ The following jobs failed:\n${failed[*]}"
           fi
 
-          echo "succeeded_message ::: $succeeded_message"          
-          echo "failed_message ::: $failed_message"          
+          echo "succeeded ::: $succeeded"          
+          echo "failed ::: $failed"          
           
           curl -X POST -H 'Content-type: application/json; charset=utf-8' \
           --data '{ branch: "master", message: "${{ succeeded_message }} ::: ${{ failed_message }}"}' $SLACK_WEBHOOK
