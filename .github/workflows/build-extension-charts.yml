@@ -94,6 +94,8 @@ jobs:
             publish="$publish -f"
           fi
 
+          exit 1;
+
           $publish
 
       - name: Upload charts artifact
