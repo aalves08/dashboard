@@ -85,6 +85,7 @@ jobs:
     steps: 
       - name: Slack message for workflow
         if: always()
+        shell: bash
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_EXT_WFS }}
         run: |
