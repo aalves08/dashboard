@@ -24,6 +24,9 @@ on:
     secrets:
       registry_token:
         required: true
+    outputs:
+      build-extension-catalog-job-status: 
+        value: ${{ jobs.build-extension-catalog.outputs.build-status }}
 
 jobs:
   build-extension-catalog:
@@ -34,7 +37,8 @@ jobs:
       actions: write
       contents: read
       packages: write
-
+    outputs:
+      build-status: ${{ job.status }}
     steps:
       - if: inputs.is_test == 'true'
         name: Checkout repository (test flow)
