@@ -109,7 +109,7 @@ jobs:
         with:
           name: charts
           path: tmp
-## TODO: if test, check if artifacts are there...
+
   release:
     name: Release Build
     if: github.ref_type == 'tag' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') || inputs.is_test != 'true'
