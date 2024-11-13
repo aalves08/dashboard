@@ -89,26 +89,8 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_EXT_WFS }}
         run: |
-          succeeded=()
-          failed=()
-          for job in "retrieve-tags-master" "test-build-extension-charts-master" "test-build-extension-catalog-master"; do
-            if [[ ${{ format('{{ job.status == "success" }}', job) }} == "true" ]]; then
-              succeeded+=("$job")
-            else
-              failed+=("$job")
-            fi
-          done
-
-          if [[ -n "${succeeded[*]}" ]]; then
-            succeeded_message="✅ The following jobs succeeded:\n${succeeded[*]}"
-          fi
-          
-          if [[ -n "${failed[*]}" ]]; then
-            failed_message="❌ The following jobs failed:\n${failed[*]}"
-          fi
-
-          echo "succeeded ::: $succeeded"          
-          echo "failed ::: $failed"          
+          echo "status for test-build-extension-charts-master - build ::: {{ jobs.test-build-extension-charts-master.outputs.build-job-status }}"    
+          echo "status for test-build-extension-charts-master - release ::: {{ jobs.test-build-extension-charts-master.outputs.release-job-status }}"    
           
           curl -X POST -H 'Content-type: application/json; charset=utf-8' \
           --data '{ branch: "master", message: "$succeeded_message ::: $failed_message"}' $SLACK_WEBHOOK

@@ -18,6 +18,9 @@ on:
       test_ext_branch:
         required: false
         type: string
+    outputs:
+      build-job-status: ${{ jobs.build.outputs.build-status }}
+      release-job-status: ${{ jobs.build.outputs.release-status }}
 
 env:
   ACTIONS_RUNNER_DEBUG: false
@@ -35,6 +38,8 @@ jobs:
     permissions:
       actions: write
       contents: read
+    outputs:
+      build-status: ${{ job.status }}
     steps:
       - if: inputs.is_test == 'true'
         name: Checkout (test flow)
@@ -114,6 +119,8 @@ jobs:
       contents: write
       deployments: write
       pages: write
+    outputs:
+      release-status: ${{ job.status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
