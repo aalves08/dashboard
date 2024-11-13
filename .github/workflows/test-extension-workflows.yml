@@ -89,8 +89,8 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_EXT_WFS }}
         run: |
-          echo "status for test-build-extension-charts-master - build ::: {{ jobs.test-build-extension-charts-master.outputs.build-job-status }}"    
-          echo "status for test-build-extension-charts-master - release ::: {{ jobs.test-build-extension-charts-master.outputs.release-job-status }}"    
+          echo "status for test-build-extension-charts-master - build ::: ${{ jobs.test-build-extension-charts-master.outputs.build-job-status }}"    
+          echo "status for test-build-extension-charts-master - release ::: ${{ jobs.test-build-extension-charts-master.outputs.release-job-status }}"    
           
           curl -X POST -H 'Content-type: application/json; charset=utf-8' \
           --data '{ branch: "master", message: "$succeeded_message ::: $failed_message"}' $SLACK_WEBHOOK
