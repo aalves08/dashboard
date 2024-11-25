@@ -23,7 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: master
+          ref: 12032-reusable-wf-tests-2
 
       - name: Retrieve Shell and Creators versions
         run: source ./shell/scripts/retrieve-versions.sh
@@ -61,7 +61,7 @@ jobs:
   #     registry_token: ${{ secrets.GITHUB_TOKEN }}
   test-release-shell-pkg-master:
     needs: retrieve-tags-master
-    uses: rancher/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
+    uses: aalves08/dashboard/.github/workflows/release-shell-pkg.yaml@12032-reusable-wf-tests-2
     with:
       # is_test:  'true'
       # test_branch:  'master'
