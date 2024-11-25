@@ -1,8 +1,8 @@
 name: Test Extension workflows
 
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  push:
+    branches: [12032-reusable-wf-tests-2]
 
 defaults:
   run:
