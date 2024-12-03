@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: 12158-test-latest-published-versions-shell
 
       - name: Setup Nodejs with yarn caching
         uses: actions/setup-node@v4
