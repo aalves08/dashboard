@@ -32,7 +32,7 @@ jobs:
           node-version: '20'
 
       - name: Retrieve Shell and Creators versions
-        run: yes | ./.github/workflows/scripts/test-extensions-creators-build.sh
+        run: ls .github/workflows/scripts && yes | ./.github/workflows/scripts/test-extensions-creators-build.sh
         id: test-extensions-and-creators
         shell: bash
   # retrieve-tags-master:
