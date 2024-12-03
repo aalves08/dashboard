@@ -98,41 +98,41 @@ jobs:
   #     tag: ${{ needs.retrieve-tags-master.outputs.CREATORS_TAG }}
 
   # slack-message:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs: [retrieve-tags-master, test-build-extension-charts-master, test-build-extension-catalog-master, test-release-shell-pkg-master, test-release-creators-pkg-master]
-    steps: 
-      - name: Slack message for workflow
-        if: always()
-        shell: bash
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_EXT_WFS }}
-        run: |
-          OUTPUT_ARRAY=("${{ needs.retrieve-tags-master.outputs.tags-job-status }}" "${{ needs.test-build-extension-charts-master.outputs.build-job-status }}" "${{ needs.test-build-extension-catalog-master.outputs.build-extension-catalog-job-status }}" "${{ needs.test-release-shell-pkg-master.outputs.build-release-shell-creators-status }}" "${{ needs.test-release-creators-pkg-master.outputs.build-release-shell-creators-status }}")
+    # if: ${{ always() }}
+    # runs-on: ubuntu-latest
+    # needs: [retrieve-tags-master, test-build-extension-charts-master, test-build-extension-catalog-master, test-release-shell-pkg-master, test-release-creators-pkg-master]
+    # steps: 
+    #   - name: Slack message for workflow
+    #     if: always()
+    #     shell: bash
+    #     env:
+    #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_EXT_WFS }}
+    #     run: |
+    #       OUTPUT_ARRAY=("${{ needs.retrieve-tags-master.outputs.tags-job-status }}" "${{ needs.test-build-extension-charts-master.outputs.build-job-status }}" "${{ needs.test-build-extension-catalog-master.outputs.build-extension-catalog-job-status }}" "${{ needs.test-release-shell-pkg-master.outputs.build-release-shell-creators-status }}" "${{ needs.test-release-creators-pkg-master.outputs.build-release-shell-creators-status }}")
 
-          if [[ ${OUTPUT_ARRAY[@]} =~ "failure" ]]; then
-            MSG_PREFIX="Workflows testing for extensions failed! 🆘"
-          else
-            MSG_PREFIX="Workflows testing for extensions succedded! ✅"
-          fi
+    #       if [[ ${OUTPUT_ARRAY[@]} =~ "failure" ]]; then
+    #         MSG_PREFIX="Workflows testing for extensions failed! 🆘"
+    #       else
+    #         MSG_PREFIX="Workflows testing for extensions succedded! ✅"
+    #       fi
 
-          echo "message prefix ::: $MSG_PREFIX"
+    #       echo "message prefix ::: $MSG_PREFIX"
 
-          TAGS_OUTPUT_STRING="status for retrieve-tags-master - build => ${{ needs.retrieve-tags-master.outputs.tags-job-status }}"
-          EXT_CHART_BUILD_OUTPUT_STRING="status for test-build-extension-charts-master - build => ${{ needs.test-build-extension-charts-master.outputs.build-job-status }}"    
-          EXT_CATALOG_BUILD_OUTPUT_STRING="status for test-build-extension-catalog-master - build => ${{ needs.test-build-extension-catalog-master.outputs.build-extension-catalog-job-status }}"    
-          RELEASE_SHELL_PKG_OUTPUT_STRING="status for test-release-shell-pkg-master - release => ${{ needs.test-release-shell-pkg-master.outputs.build-release-shell-creators-status }}"    
-          RELEASE_CREATORS_PKG_OUTPUT_STRING="status for test-release-creators-pkg-master - release => ${{ needs.test-release-creators-pkg-master.outputs.build-release-shell-creators-status }}"    
+    #       TAGS_OUTPUT_STRING="status for retrieve-tags-master - build => ${{ needs.retrieve-tags-master.outputs.tags-job-status }}"
+    #       EXT_CHART_BUILD_OUTPUT_STRING="status for test-build-extension-charts-master - build => ${{ needs.test-build-extension-charts-master.outputs.build-job-status }}"    
+    #       EXT_CATALOG_BUILD_OUTPUT_STRING="status for test-build-extension-catalog-master - build => ${{ needs.test-build-extension-catalog-master.outputs.build-extension-catalog-job-status }}"    
+    #       RELEASE_SHELL_PKG_OUTPUT_STRING="status for test-release-shell-pkg-master - release => ${{ needs.test-release-shell-pkg-master.outputs.build-release-shell-creators-status }}"    
+    #       RELEASE_CREATORS_PKG_OUTPUT_STRING="status for test-release-creators-pkg-master - release => ${{ needs.test-release-creators-pkg-master.outputs.build-release-shell-creators-status }}"    
 
-          echo $TAGS_OUTPUT_STRING    
-          echo $EXT_CHART_BUILD_OUTPUT_STRING    
-          echo $EXT_CATALOG_BUILD_OUTPUT_STRING
-          echo $RELEASE_SHELL_PKG_OUTPUT_STRING    
-          echo $RELEASE_CREATORS_PKG_OUTPUT_STRING    
+    #       echo $TAGS_OUTPUT_STRING    
+    #       echo $EXT_CHART_BUILD_OUTPUT_STRING    
+    #       echo $EXT_CATALOG_BUILD_OUTPUT_STRING
+    #       echo $RELEASE_SHELL_PKG_OUTPUT_STRING    
+    #       echo $RELEASE_CREATORS_PKG_OUTPUT_STRING    
         
-          MSG="$MSG_PREFIX ::: $TAGS_OUTPUT_STRING ::: $EXT_CHART_BUILD_OUTPUT_STRING ::: $EXT_CATALOG_BUILD_OUTPUT_STRING ::: $RELEASE_SHELL_PKG_OUTPUT_STRING ::: $RELEASE_CREATORS_PKG_OUTPUT_STRING"
+    #       MSG="$MSG_PREFIX ::: $TAGS_OUTPUT_STRING ::: $EXT_CHART_BUILD_OUTPUT_STRING ::: $EXT_CATALOG_BUILD_OUTPUT_STRING ::: $RELEASE_SHELL_PKG_OUTPUT_STRING ::: $RELEASE_CREATORS_PKG_OUTPUT_STRING"
 
-          echo "message sent: $MSG"
+    #       echo "message sent: $MSG"
 
-          curl -X POST -H 'Content-type: application/json; charset=utf-8' \
-          --data "{\"branch\": \"master\", \"message\": \"$MSG\", \"workflow_run\": ${{ github.run_id }} }" $SLACK_WEBHOOK
+    #       curl -X POST -H 'Content-type: application/json; charset=utf-8' \
+    #       --data "{\"branch\": \"master\", \"message\": \"$MSG\", \"workflow_run\": ${{ github.run_id }} }" $SLACK_WEBHOOK
