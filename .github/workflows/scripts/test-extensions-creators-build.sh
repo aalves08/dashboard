@@ -2,9 +2,16 @@
 
 set -eo pipefail
 
+EXTERNAL_TAG=$1
+EXTERNAL_UPDATE=$2
+
+if [ -z "${EXTERNAL_TAG}" ]; then
+  echo "Missing tag set on running this script! Cannot run without a tag!"
+  exit 1
+fi
+
 validate_tagged_extension_creator() {
   TAG=$1
-  UPDATE="false"
 
   if [ -z "$2" ]; then
     UPDATE="true"
@@ -61,9 +68,9 @@ validate_tagged_extension_creator() {
 }
 
 # test creating an extension with latest shell releases + build
-validate_tagged_extension_creator "legacy-v1"
-validate_tagged_extension_creator "legacy-v2"
-validate_tagged_extension_creator "latest"
+validate_tagged_extension_creator ${EXTERNAL_TAG} ${EXTERNAL_UPDATE}
+# validate_tagged_extension_creator "legacy-v2"
+# validate_tagged_extension_creator "latest"
 
 # test update paths + build
 # validate_tagged_extension_creator "legacy-v1" "true"

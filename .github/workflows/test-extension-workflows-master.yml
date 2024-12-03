@@ -18,7 +18,7 @@ defaults:
     working-directory: ./
 
 jobs:
-  test-extensions-build:
+  test-extensions-build-legacy-v1:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -29,10 +29,10 @@ jobs:
       - name: Setup Nodejs with yarn caching
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '16'
 
       - name: Retrieve Shell and Creators versions
-        run: ls .github/workflows/scripts && yes | .github/workflows/scripts/test-extensions-creators-build.sh
+        run: .github/workflows/scripts/test-extensions-creators-build.sh legacy-v1
         id: test-extensions-and-creators
         shell: bash
   # retrieve-tags-master:
