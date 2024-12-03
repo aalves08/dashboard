@@ -7,10 +7,10 @@ on:
     branches:
       - 12158-test-latest-published-versions-shell
       - master
-  pull_request:
-    branches:
-      - 12158-test-latest-published-versions-shell
-      - master
+  # pull_request:
+  #   branches:
+  #     - 12158-test-latest-published-versions-shell
+  #     - master
 
 defaults:
   run:
