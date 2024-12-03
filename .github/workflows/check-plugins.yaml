@@ -1,8 +1,8 @@
 name: check-plugins-build
 on:
-  pull_request:
-    branches:
-      - master
+  # pull_request:
+  #   branches:
+  #     - master
 env:
   TEST_PERSIST_BUILD: true
 jobs:

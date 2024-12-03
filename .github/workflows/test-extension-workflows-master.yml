@@ -3,9 +3,10 @@ name: Test Extension workflows
 on:
   # schedule:
   #   - cron: "0 0 * * *"
-  push:
+  pull_request:
     branches:
       - 12158-test-latest-published-versions-shell
+      - master
 
 defaults:
   run:
