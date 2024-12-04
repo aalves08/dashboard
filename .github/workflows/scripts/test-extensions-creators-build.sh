@@ -19,7 +19,9 @@ validate_tagged_extension_creator() {
   DIR=$(mktemp -d)
   pushd $DIR > /dev/null
 
+  echo "*** ***************************************** ***"
   echo "*** Verifying extension creator for tag ::: ${TAG} ***"
+  echo "*** ***************************************** ***"
   echo "Using temporary directory ${DIR}"
 
   echo "=> Setting up node version required for this env: ${NODE_VERSION}"
@@ -40,10 +42,14 @@ validate_tagged_extension_creator() {
 
 
   if [ $UPDATE == "true" ]; then
+    echo "*** ***************************************** ***"
     echo "*** Testing FULL UPGRADE path for extensions ***"
-    echo "Testing UPGRADE from legacy-v1 to legacy-v2"
+    echo "*** ***************************************** ***"
+    echo "=> Testing UPGRADE from legacy-v1 to legacy-v2"
 
-    npm init @rancher/extension@legacy-v2 -- --update -f
+    git init
+
+    npm init @rancher/extension@legacy-v2 -- --update
 
     rm -rf node_modules
     rm -rf yarn.lock
@@ -52,7 +58,9 @@ validate_tagged_extension_creator() {
 
     yarn build-pkg test-pkg | cat
 
+    echo "*** ***************************************** ***"
     echo "*** Testing UPGRADE from legacy-v2 to latest ***"
+    echo "*** ***************************************** ***"
 
     echo "=> Updating node version required for last leg of upgrade path: v20"
 
