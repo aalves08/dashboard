@@ -33,7 +33,6 @@ jobs:
         run: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
-          npm --help
 
       - name: Retrieve Shell and Creators versions
         run: .github/workflows/scripts/test-extensions-creators-build.sh
