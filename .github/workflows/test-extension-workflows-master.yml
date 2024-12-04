@@ -211,7 +211,7 @@ jobs:
             else
               EMOJI="✅"
             fi
-            MSG_OUTPUT="$MSG_OUTPUT \n::: Status for ${JOB_NAME_ARRAY[$i]} => ${OUTPUT_ARRAY[$i]} $EMOJI"
+            MSG_OUTPUT="$MSG_OUTPUT \n::: Status for $JOB_NAME_ARRAY[$i] => $OUTPUT_ARRAY[$i] $EMOJI"
           done
 
           echo "message sent: $MSG_OUTPUT"
