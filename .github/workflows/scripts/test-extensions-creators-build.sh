@@ -59,6 +59,7 @@ validate_tagged_extension_creator() {
     git init
     #when doing git init, we are sent to .git folder
     cd ..
+    cd test-pkg
 
     echo "=> Current dir 4:"
     pwd
