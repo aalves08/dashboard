@@ -28,10 +28,12 @@ jobs:
         with:
           ref: 12158-test-latest-published-versions-shell
 
-      # - name: Setup Nodejs with yarn caching
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '16'
+      - name: Sourcing NVM
+        shell: bash
+        run: |
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
+          npm --help
 
       - name: Retrieve Shell and Creators versions
         run: .github/workflows/scripts/test-extensions-creators-build.sh
