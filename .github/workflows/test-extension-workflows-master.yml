@@ -206,7 +206,7 @@ jobs:
           for i in "${OUTPUT_ARRAY[@]}"
           do
             echo "$i"
-            if [[ ${OUTPUT_ARRAY[$1]} = "failure" ]]; then
+            if [[ $OUTPUT_ARRAY[$1] == "failure" ]]; then
               EMOJI="🆘"
             else
               EMOJI="✅"
