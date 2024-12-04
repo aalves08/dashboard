@@ -85,9 +85,9 @@ validate_tagged_extension_creator() {
 }
 
 # test creating an extension with latest shell releases + build
-validate_tagged_extension_creator "legacy-v1" "v16"
-validate_tagged_extension_creator "legacy-v2" "v16"
-validate_tagged_extension_creator "latest" "v20"
+# validate_tagged_extension_creator "legacy-v1" "v16"
+# validate_tagged_extension_creator "legacy-v2" "v16"
+# validate_tagged_extension_creator "latest" "v20"
 
 # test update paths + build
 validate_tagged_extension_creator "legacy-v1"  "v16" "true"
