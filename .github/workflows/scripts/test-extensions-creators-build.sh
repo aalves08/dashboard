@@ -27,8 +27,6 @@ validate_tagged_extension_creator() {
 
   echo "=> Setting up node version required for this env: ${NODE_VERSION}"
   echo "=> Current dir 1:"
-  ls
-  echo "=> Current dir 2:"
   pwd
 
   # setting up correct version of node  
@@ -46,9 +44,7 @@ validate_tagged_extension_creator() {
   # test build of pkg inside skeleton app
   yarn build-pkg test-pkg | cat
 
-  echo "=> Current dir 3:"
-  ls
-  echo "=> Current dir 4:"
+  echo "=> Current dir 2:"
   pwd
 
   if [ $UPDATE == "true" ]; then
@@ -57,16 +53,14 @@ validate_tagged_extension_creator() {
     echo "*** ***************************************** ***"
     echo "=> Testing UPGRADE from legacy-v1 to legacy-v2"
 
-    echo "=> Current dir 5:"
-    ls
-    echo "=> Current dir 6:"
+    echo "=> Current dir 3:"
     pwd
 
     git init
+    #when doing git init, we are sent to .git folder
+    cd ..
 
-    echo "=> Current dir 7:"
-    ls
-    echo "=> Current dir 8:"
+    echo "=> Current dir 4:"
     pwd
 
     npm init @rancher/extension@legacy-v2 -- --update
