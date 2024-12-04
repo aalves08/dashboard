@@ -69,7 +69,7 @@ jobs:
       - name: Setup Nodejs with yarn caching
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '16'
 
       - name: Retrieve Shell and Creators versions
         run: .github/workflows/scripts/test-extensions-creators-build.sh latest
