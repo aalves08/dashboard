@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -eo pipefail
 
@@ -34,7 +34,7 @@ validate_tagged_extension_creator() {
   # generate skeleton app
   npm init @rancher/extension@${TAG} test-pkg --app-name test-app | cat
 
-  pushd test-pkg > /dev/null
+  cd test-pkg
 
   # install dependencies
   yarn install
@@ -44,6 +44,9 @@ validate_tagged_extension_creator() {
 
 
   if [ $UPDATE == "true" ]; then
+    pushd $DIR > /dev/null
+    cd test-pkg
+
     echo "*** ***************************************** ***"
     echo "*** Testing FULL UPGRADE path for extensions ***"
     echo "*** ***************************************** ***"
