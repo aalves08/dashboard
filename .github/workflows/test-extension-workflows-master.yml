@@ -34,7 +34,7 @@ jobs:
           node-version: '16'
 
       - name: Retrieve Shell and Creators versions
-        run: .github/workflows/scripts/test-extensions-creators-build.sh legacy-v1
+        run: .github/workflows/scripts/test-extensions-creators-build.sh legacy-v1 true
         id: test-extensions-and-creators
         shell: bash
   test-extensions-build-legacy-v2:
@@ -205,7 +205,6 @@ jobs:
 
           for index in "${!OUTPUT_ARRAY[@]}"
           do
-            echo "$index"
             if [[ ${OUTPUT_ARRAY[$index]} == "failure" ]]; then
               EMOJI="🆘"
             else

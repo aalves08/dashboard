@@ -33,32 +33,30 @@ validate_tagged_extension_creator() {
   yarn build-pkg test-pkg | cat
 
 
-#   if [ $UPDATE == "true" ]; then
-#     echo "*** Testing full update path for extensions ***"
-#     echo "Testing update from legacy-v1 to legacy-v2"
+  if [ $UPDATE == "true" ]; then
+    echo "*** Testing full update path for extensions ***"
+    echo "Testing update from legacy-v1 to legacy-v2"
 
-#     #TODO: test update paths when their are implemented
-#     yarn create @rancher/extension --update "legacy-v2"
+    npm init @rancher/extension@legacy-v2 -- --update
 
-#     rm -rf node_modules
-#     rm -rf yarn.lock
+    rm -rf node_modules
+    rm -rf yarn.lock
 
-#     yarn install
+    yarn install
 
-#     yarn build-pkg test-pkg | cat
+    yarn build-pkg test-pkg | cat
 
-#     echo "Testing update from legacy-v2 to latest"
+    echo "Testing update from legacy-v2 to latest"
 
-#     #TODO: test update paths when their are implemented
-#     yarn create @rancher/extension --update "latest"
+    npm init @rancher/extension -- --migrate
 
-#     rm -rf node_modules
-#     rm -rf yarn.lock
+    rm -rf node_modules
+    rm -rf yarn.lock
 
-#     yarn install
+    yarn install
 
-#     yarn build-pkg test-pkg | cat
-#   fi
+    yarn build-pkg test-pkg | cat
+  fi
 
   echo "Cleaning temporary dir"
   popd > /dev/null
