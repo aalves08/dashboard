@@ -15,7 +15,6 @@ validate_tagged_extension_creator() {
 
   export NVM_DIR=~/.nvm
   source ~/.nvm/nvm.sh
-  npm --help
 
   DIR=$(mktemp -d)
   pushd $DIR > /dev/null
