@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -eo pipefail
 
@@ -13,6 +13,7 @@ validate_tagged_extension_creator() {
     UPDATE="true"
   fi
 
+  # these two commands will allow for NVM to work in bash, since it's included in ubuntu-latest
   export NVM_DIR=~/.nvm
   source ~/.nvm/nvm.sh
 
@@ -26,18 +27,19 @@ validate_tagged_extension_creator() {
 
   echo "=> Setting up node version required for this env: ${NODE_VERSION}"
 
-  
-
+  # setting up correct version of node  
   nvm install ${NODE_VERSION}
   nvm use ${NODE_VERSION}
 
-  # TODO: change yarn create to use the new tag approach (jordon to tweak code upstream)
+  # generate skeleton app
   npm init @rancher/extension@${TAG} test-pkg --app-name test-app | cat
 
   pushd test-pkg > /dev/null
 
+  # install dependencies
   yarn install
 
+  # test build of pkg inside skeleton app
   yarn build-pkg test-pkg | cat
 
 
