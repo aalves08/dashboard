@@ -13,7 +13,8 @@ fi
 validate_tagged_extension_creator() {
   TAG=$1
 
-  if [ -z "$2" ]; then
+  if [ -n "$2" ]; then
+    echo "will also cover the update path and migration on this run"
     UPDATE="true"
   fi
 
