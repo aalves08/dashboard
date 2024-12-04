@@ -26,6 +26,10 @@ validate_tagged_extension_creator() {
   echo "Using temporary directory ${DIR}"
 
   echo "=> Setting up node version required for this env: ${NODE_VERSION}"
+  echo "=> Current dir 1:"
+  ls
+  echo "=> Current dir 2:"
+  pwd
 
   # setting up correct version of node  
   nvm install ${NODE_VERSION}
@@ -42,6 +46,10 @@ validate_tagged_extension_creator() {
   # test build of pkg inside skeleton app
   yarn build-pkg test-pkg | cat
 
+  echo "=> Current dir 3:"
+  ls
+  echo "=> Current dir 4:"
+  pwd
 
   if [ $UPDATE == "true" ]; then
     echo "*** ***************************************** ***"
@@ -49,7 +57,17 @@ validate_tagged_extension_creator() {
     echo "*** ***************************************** ***"
     echo "=> Testing UPGRADE from legacy-v1 to legacy-v2"
 
+    echo "=> Current dir 5:"
+    ls
+    echo "=> Current dir 6:"
+    pwd
+
     git init
+
+    echo "=> Current dir 7:"
+    ls
+    echo "=> Current dir 8:"
+    pwd
 
     npm init @rancher/extension@legacy-v2 --update
 
