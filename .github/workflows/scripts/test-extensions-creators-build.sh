@@ -34,7 +34,7 @@ validate_tagged_extension_creator() {
   # generate skeleton app
   npm init @rancher/extension@${TAG} test-pkg --app-name test-app | cat
 
-  cd test-pkg
+  pushd test-pkg > /dev/null
 
   # install dependencies
   yarn install
@@ -44,13 +44,12 @@ validate_tagged_extension_creator() {
 
 
   if [ $UPDATE == "true" ]; then
-    pushd $DIR > /dev/null
-    cd test-pkg
-
     echo "*** ***************************************** ***"
     echo "*** Testing FULL UPGRADE path for extensions ***"
     echo "*** ***************************************** ***"
     echo "=> Testing UPGRADE from legacy-v1 to legacy-v2"
+
+    yarn install
 
     git init
 
