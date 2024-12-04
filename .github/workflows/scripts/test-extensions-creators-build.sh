@@ -69,7 +69,7 @@ validate_tagged_extension_creator() {
     echo "=> Current dir 8:"
     pwd
 
-    npm init @rancher/extension@legacy-v2 --update
+    npm init @rancher/extension@legacy-v2 -- --update
 
     rm -rf node_modules
     rm -rf yarn.lock
