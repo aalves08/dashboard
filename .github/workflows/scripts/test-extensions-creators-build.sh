@@ -13,6 +13,10 @@ validate_tagged_extension_creator() {
     UPDATE="true"
   fi
 
+  export NVM_DIR=~/.nvm
+  source ~/.nvm/nvm.sh
+  npm --help
+
   DIR=$(mktemp -d)
   pushd $DIR > /dev/null
 
@@ -20,6 +24,8 @@ validate_tagged_extension_creator() {
   echo "Using temporary directory ${DIR}"
 
   echo "=> Setting up node version required for this env: ${NODE_VERSION}"
+
+  
 
   nvm install ${NODE_VERSION}
   nvm use ${NODE_VERSION}

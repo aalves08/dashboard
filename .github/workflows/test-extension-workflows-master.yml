@@ -28,12 +28,6 @@ jobs:
         with:
           ref: 12158-test-latest-published-versions-shell
 
-      - name: Sourcing NVM
-        shell: bash
-        run: |
-          export NVM_DIR=~/.nvm
-          source ~/.nvm/nvm.sh
-
       - name: Retrieve Shell and Creators versions
         run: .github/workflows/scripts/test-extensions-creators-build.sh
         id: test-extensions-and-creators
