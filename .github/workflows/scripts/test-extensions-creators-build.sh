@@ -49,11 +49,9 @@ validate_tagged_extension_creator() {
     echo "*** ***************************************** ***"
     echo "=> Testing UPGRADE from legacy-v1 to legacy-v2"
 
-    yarn install
-
     git init
 
-    npm init @rancher/extension@legacy-v2 -- --update
+    npm init @rancher/extension@legacy-v2 --update
 
     rm -rf node_modules
     rm -rf yarn.lock
