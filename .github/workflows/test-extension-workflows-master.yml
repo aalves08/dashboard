@@ -203,15 +203,15 @@ jobs:
 
           MSG_OUTPUT="$MSG_PREFIX"
 
-          for i in "${OUTPUT_ARRAY[@]}"
+          for index in "${!OUTPUT_ARRAY[@]}"
           do
-            echo "$i"
-            if [[ $OUTPUT_ARRAY[$1] == "failure" ]]; then
+            echo "$index"
+            if [[ ${OUTPUT_ARRAY[$index]} == "failure" ]]; then
               EMOJI="🆘"
             else
               EMOJI="✅"
             fi
-            MSG_OUTPUT="$MSG_OUTPUT \n::: Status for $JOB_NAME_ARRAY[$i] => $OUTPUT_ARRAY[$i] $EMOJI"
+            MSG_OUTPUT="$MSG_OUTPUT \n::: Status for ${JOB_NAME_ARRAY[$index]} => ${OUTPUT_ARRAY[$index]} $EMOJI"
           done
 
           echo "message sent: $MSG_OUTPUT"
