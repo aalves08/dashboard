@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+SKELETON_APP_NAME="test-pkg"
+
 
 validate_tagged_extension_creator() {
   TAG=$1
@@ -18,7 +20,7 @@ validate_tagged_extension_creator() {
   source ~/.nvm/nvm.sh
 
   DIR=$(mktemp -d)
-  pushd $DIR > /dev/null
+  cd $DIR
 
   echo "*** ***************************************** ***"
   echo "*** Verifying extension creator for tag ::: ${TAG} ***"
@@ -34,15 +36,14 @@ validate_tagged_extension_creator() {
   nvm use ${NODE_VERSION}
 
   # generate skeleton app
-  npm init @rancher/extension@${TAG} test-pkg --app-name test-app | cat
-
-  pushd test-pkg > /dev/null
+  npm init @rancher/extension@${TAG} ${SKELETON_APP_NAME} --app-name test-app | cat
+  cd ${SKELETON_APP_NAME}
 
   # install dependencies
   yarn install
 
   # test build of pkg inside skeleton app
-  yarn build-pkg test-pkg | cat
+  yarn build-pkg ${SKELETON_APP_NAME} | cat
 
   echo "=> Current dir 2:"
   pwd
@@ -59,7 +60,7 @@ validate_tagged_extension_creator() {
     git init
     #when doing git init, we are sent to .git folder
     cd ..
-    cd test-pkg
+    cd ${SKELETON_APP_NAME}
 
     echo "=> Current dir 4:"
     pwd
@@ -71,7 +72,7 @@ validate_tagged_extension_creator() {
 
     yarn install
 
-    yarn build-pkg test-pkg | cat
+    yarn build-pkg ${SKELETON_APP_NAME} | cat
 
     echo "*** ***************************************** ***"
     echo "*** Testing UPGRADE from legacy-v2 to latest ***"
@@ -89,11 +90,11 @@ validate_tagged_extension_creator() {
 
     yarn install
 
-    yarn build-pkg test-pkg | cat
+    yarn build-pkg ${SKELETON_APP_NAME} | cat
   fi
 
   echo "Cleaning temporary dir"
-  popd > /dev/null
+  cd ${DIR}
 
   echo "Removing folder ${DIR}"
   rm -rf ${DIR}
