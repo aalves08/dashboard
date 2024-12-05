@@ -31,7 +31,7 @@ jobs:
       - name: Retrieve Shell and Creators versions
         run: .github/workflows/scripts/test-extensions-creators-build.sh
         id: test-extensions-and-creators
-        shell: bash
+        shell: sh
   # test-extensions-build-legacy-v1:
   #   runs-on: ubuntu-latest
   #   outputs:
