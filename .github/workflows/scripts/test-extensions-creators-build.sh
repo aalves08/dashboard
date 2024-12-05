@@ -72,6 +72,9 @@ validate_tagged_extension_creator() {
 
     yarn install
 
+    cat package.json
+    cat /pkg/test-pkg/package.json
+
     yarn build-pkg ${SKELETON_APP_NAME} | cat
 
     echo "*** ***************************************** ***"
@@ -84,6 +87,10 @@ validate_tagged_extension_creator() {
     nvm use v20
 
     npm init @rancher/extension -- --migrate
+
+    # debug changes done via migration script
+    cat package.json
+    cat /pkg/test-pkg/package.json
 
     rm -rf node_modules
     rm -rf yarn.lock
