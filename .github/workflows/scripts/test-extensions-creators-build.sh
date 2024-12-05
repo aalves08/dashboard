@@ -61,7 +61,6 @@ validate_tagged_extension_creator() {
     #when doing git init, we are sent to .git folder
     cd ..
     cd ${SKELETON_APP_NAME}
-    cd pkg
 
     echo "=> Current dir 4:"
     pwd
