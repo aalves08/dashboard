@@ -73,7 +73,6 @@ validate_tagged_extension_creator() {
     yarn install
 
     cat package.json
-    cat /pkg/test-pkg/package.json
 
     yarn build-pkg ${SKELETON_APP_NAME} | cat
 
@@ -90,7 +89,6 @@ validate_tagged_extension_creator() {
 
     # debug changes done via migration script
     cat package.json
-    cat /pkg/test-pkg/package.json
 
     rm -rf node_modules
     rm -rf yarn.lock
