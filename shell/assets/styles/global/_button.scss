@@ -73,9 +73,16 @@ button,
     color: var(--primary-text);
   }
 
-  &:focus, &.focused {
-    background-color: var(--primary-hover-bg);
-    color: var(--primary-text);
+  // &:focus, &.focused {
+  //   background-color: var(--primary-hover-bg);
+  //   color: var(--primary-text);
+  // }
+
+  &:focus, &.focused, &:focus-visible {
+    @include focus-outline;
+    outline-offset: 4px;
+    // background: none;
+    box-shadow: none;
   }
 }
 
@@ -89,17 +96,24 @@ button,
     color: var(--lightest) !important;
   }
 
-  &:focus, &.focused {
-    background-color: var(--primary-hover-bg);
-    color: var(--primary-text) !important;
+  // &:focus, &.focused {
+  //   background-color: var(--primary-hover-bg);
+  //   color: var(--primary-text) !important;
+  // }
+
+  &:focus, &.focused, &:focus-visible {
+    @include focus-outline;
+    outline-offset: 4px;
+    background: none;
+    box-shadow: none;
   }
 
   &.btn-sm {
     line-height: $btn-sm-height - 2px;
 
-    &:focus, &.focused {
-      border: 0;
-    }
+    // &:focus, &.focused {
+    //   border: 0;
+    // }
   }
 }
 

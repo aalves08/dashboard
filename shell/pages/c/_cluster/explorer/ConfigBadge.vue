@@ -24,11 +24,17 @@ export default {
 </script>
 
 <template>
-  <div class="config-badge">
+  <div
+    class="config-badge"
+  >
     <div>
       <a
+        role="button"
         class="badge-install btn btn-sm role-secondary"
         data-testid="add-custom-cluster-badge"
+        tabindex="0"
+        @keyup.enter="customBadgeDialog"
+        @keyup.space="customBadgeDialog"
         @click="customBadgeDialog"
       >
         <i
@@ -41,24 +47,29 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-  .badge-install:hover {
-    cursor: pointer;
+  .config-badge {
+
+    .badge-install {
+      display: flex;
+      margin-left: 10px;
+
+      &:hover {
+        border-color: var(--lightest);
+        cursor: pointer;
+      }
+
+      &:focus-visible {
+        @include focus-outline;
+        outline-offset: 4px;
+      }
+
+      > I {
+        line-height: inherit;
+      }
+
+      // &:focus {
+      //   outline: 0;
+      // }
+    }
   }
-  .badge-install {
-    display: flex;
-    margin-left: 10px;
-
-    &:hover {
-      border-color: var(--lightest);
-    }
-
-    > I {
-      line-height: inherit;
-    }
-
-    &:focus {
-      outline: 0;
-    }
-  }
-
 </style>

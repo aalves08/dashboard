@@ -30,6 +30,10 @@ import ShortKey from '@shell/plugins/shortkey';
 import 'floating-vue/dist/style.css';
 import { floatingVueOptions } from '@shell/plugins/floating-vue';
 
+// In order to tackle a11y issues, we need to disable the focus trigger for tooltips
+// otherwise it messes up the order of the tabindex as it superseeds any other tabindexes
+FloatingVue.options.themes.tooltip.triggers = ['hover', 'touch'];
+
 export async function installPlugins(vueApp) {
   vueApp.use(globalFormatters);
   vueApp.use(PortalVue);

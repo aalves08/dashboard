@@ -211,6 +211,7 @@ export default {
 
 <template>
   <Card
+    v-trap="true"
     class="prompt-badge"
     :show-highlight-border="false"
   >
@@ -257,6 +258,7 @@ export default {
           <div class="badge-customisation-badge">
             <Checkbox
               v-model:value="badgeAsIcon"
+              :tabbing-index="0"
               :label="t('clusterBadge.modal.badgeAsIcon')"
 
               :tooltip="t('clusterBadge.modal.maxCharsTooltip')"
@@ -264,6 +266,7 @@ export default {
 
             <LabeledInput
               v-model:value.trim="letter"
+              :tabindex="!badgeAsIcon ? -1 : 3"
               :disabled="!badgeAsIcon"
               class="badge-icon-text"
               :label="t('clusterBadge.modal.iconText')"
@@ -275,11 +278,13 @@ export default {
           <div>
             <Checkbox
               v-model:value="useCustomComment"
+              tabbing-index="1"
               :label="t('clusterBadge.modal.checkbox')"
             />
 
             <LabeledInput
               v-model:value.trim="badgeComment"
+              :tabindex="!useCustomComment ? -1 : 4"
               :disabled="!useCustomComment"
               :label="t('clusterBadge.modal.comment')"
               :maxlength="32"
@@ -290,10 +295,12 @@ export default {
           <div class="badge-customisation-color">
             <Checkbox
               v-model:value="badgeColorPicker"
+              tabindex="2"
               :label="t('clusterBadge.modal.badgeBgColor')"
             />
             <ColorInput
               v-model:value="badgeBgColor"
+              :tabindex="!badgeColorPicker ? -1 : 5"
               :disabled="!badgeColorPicker"
               :default-value="badgeBgColor"
             />
