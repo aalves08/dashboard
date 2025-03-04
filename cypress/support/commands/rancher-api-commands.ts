@@ -14,15 +14,18 @@ Cypress.Commands.add('login', (
   username = Cypress.env('username'),
   password = Cypress.env('password'),
   cacheSession = true,
+  skipNavigation = false,
 ) => {
   const login = () => {
     cy.intercept('POST', '/v3-public/localProviders/local*').as('loginReq');
 
-    LoginPagePo.goTo(); // Needs to happen before the page element is created/located
+    if (!skipNavigation) {
+      LoginPagePo.goTo(); // Needs to happen before the page element is created/located
+    }
     const loginPage = new LoginPagePo();
 
     loginPage
-      .checkIsCurrentPage();
+      .checkIsCurrentPage(!skipNavigation);
 
     loginPage.switchToLocal();
 
@@ -1089,15 +1092,17 @@ Cypress.Commands.add('tableRowsPerPageAndNamespaceFilter', (rows: number, cluste
   });
 });
 
-// Update the user preferences by over-writing the given prefrence
+// Update the user preferences by over-writing the given preference
 Cypress.Commands.add('setUserPreference', (prefs: any) => {
-  return cy.getRancherResource('v3', 'users?me=true').then((resp: Cypress.Response<any>) => {
+  return cy.getRancherResource('v1', 'userpreferences').then((resp: Cypress.Response<any>) => {
     const update = resp.body.data[0];
 
     update.data = {
       ...update.data,
       ...prefs
     };
+
+    delete update.links;
 
     return cy.setRancherResource('v1', 'userpreferences', update.id, update);
   });

@@ -94,7 +94,7 @@ export default {
       if (neu) {
         this.afterLoginRoute = neu;
       } else {
-        this.afterLoginRoute = this.routeFromDropdown?.value;
+        this.afterLoginRoute = this.routeFromDropdown?.value || this.routeDropdownOptions[0]?.value;
       }
     },
   }
@@ -120,10 +120,12 @@ export default {
             :val="false"
             :value="afterLoginRoute=== 'home' || afterLoginRoute === 'last-visited'"
             :v-bind="$attrs"
-            @update:value="afterLoginRoute = false"
+            :prevent-focus-on-radio-groups="true"
+            @update:value="updateLoginRoute(null)"
           />
           <Select
             v-model:value="routeFromDropdown"
+            :aria-label="t('landing.landingPrefs.ariaLabelTakeMeToCluster')"
             :searchable="true"
             :disabled="afterLoginRoute === 'home' || afterLoginRoute === 'last-visited'"
             :clearable="false"

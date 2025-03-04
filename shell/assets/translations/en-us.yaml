@@ -137,6 +137,9 @@ locale:
 
 nav:
   ariaLabel:
+    clusterIconKeyCombo: Cluster keyboard shortcut combination icon
+    localClusterIcon: Local Cluster icon
+    clusterProvIcon: Cluster {cluster} provider icon
     topLevelMenu: Main menu
     homePage: Home page navigation menu
     cluster: Cluster menu item
@@ -146,7 +149,7 @@ nav:
     configurationApps: Main menu configuration app menu item
     support: Support page link
     about: About page link
-    pinCluster: Pin/Unpin cluster
+    pinCluster: Pin/Unpin {cluster} cluster
     collapseExpand: Collapse/Expand menu group
     productAboutPage: Product about page link
   alt:
@@ -545,6 +548,7 @@ authConfig:
     tls: TLS
     userEnabledAttribute: User Enabled Attribute
     userMemberAttribute: User Member Attribute
+    userLoginFilter: User Login Filter
     userSearchBase:
       label: User Search Base
       placeholder: 'e.g. ou=users,dc=mycompany,dc=com'
@@ -658,6 +662,9 @@ authConfig:
     key:
       label: Private Key
       placeholder: Paste in the private key, typically starting with -----BEGIN RSA PRIVATE KEY-----
+    groupSearch:
+      label: Enable group search
+      tooltip: Allows users with appropriate permissions to search and view all groups within the OIDC provider's realm. This can be useful for administrators who need to assign global roles to groups that they are not currently a member of.
   stateBanner:
     disabled: 'The {provider} authentication provider is currently disabled.'
     enabled: 'The {provider} authentication provider is currently enabled.'
@@ -931,6 +938,8 @@ catalog:
         label: Resources
         busy: The related resources will appear when {app} is fully installed.
       values: Values YAML
+    upgrade:
+      uncertainUpgradeWarningTooltip: Unable to determine if an upgrade is available (can not identify the repository and chart used to deploy this application)
   chart:
     registry:
       label: Container Registry
@@ -1125,7 +1134,8 @@ catalog:
     oci:
       urlLabel: OCI Repository Host URL
       placeholder: 'e.g. oci://<registry-host>/<namespace>/<chart-name>:<tag>'
-      info: Add OCI URLs that contain ONLY helm charts. For large repositories containing many charts consider targeting a specific namespace or chart to improve performance, for example with oci://<registry-host>/<namespace> or oci://<registry-host>/<namespace>/<chart-name>. The list of charts available from the repository is updated every 6 hours.
+      warning: OCI URLs must ONLY target helm chart/s.
+      info: For large repositories containing many charts consider targeting a specific namespace or chart to improve performance, for example with oci://<registry-host>/<namespace> or oci://<registry-host>/<namespace>/<chart-name>.
       skipTlsVerifications: Skip TLS Verifications
       insecurePlainHttp: Insecure Plain Http
       exponentialBackOff:
@@ -1883,6 +1893,8 @@ cluster:
         =1 { {pool_name}: The provided value for {fields} was not found in the list of expected values. This can happen with clusters provisioned outside of Rancher or when options for the provider have changed. }
         other { {pool_name}: The provided values for {fields} were not found in the list of expected values. This can happen with clusters provisioned outside of Rancher or when options for the provider have changed. }
       }
+    rke1DeprecationMessage: 'Rancher Kubernetes Engine (RKE / RKE1) will reach end of life on July 31, 2025. Rancher 2.12.0 and later will no longer support provisioning or managing downstream RKE1 clusters. We recommend replatforming RKE1 clusters to RKE2 to ensure continued support and security updates. Learn more about the transition <a href="https://www.suse.com/support/kb/doc/?id=000021518" target="_blank" rel="noopener noreferrer nofollow">here</a>.'
+    rke1DeprecationShortMessage: Rancher Kubernetes Engine (RKE / RKE1) will reach end of life on July 31, 2025. Rancher 2.12.0 and later will no longer support provisioning or managing downstream RKE1 clusters.
   rkeTemplateUpgrade: Template revision {name} available for upgrade
   cloudCredentials:
     renew: Renew Cloud Credentials
@@ -1986,11 +1998,12 @@ cluster:
     aliyun:  Alibaba ACK
     amazonec2: Amazon EC2
     amazoneks: Amazon EKS
+    amazonelasticcontainerservice: Amazon EKS (Unsupported Kev1)
     aws: Amazon
     azure: Azure
     azureaks: Azure AKS
     aks: Azure AKS
-    azurekubernetesservice: Azure AKS
+    azurekubernetesservice: Azure AKS (Unsupported Kev1)
     baiducloudcontainerengine: Baidu CCE
     baidu: Baidu CCE
     cloudca: Cloud.ca
@@ -2004,6 +2017,7 @@ cluster:
     google: Google GCE
     googlegke: Google GKE
     gke: Google GKE
+    googlekubernetesengine: Google GKE (Unsupported Kev1)
     harvester: Harvester
     huaweicce: Huawei CCE
     import: Generic
@@ -2060,7 +2074,7 @@ cluster:
         title: Save Machine Configurations
         body: Machine Configurations define how machines in Pools are deployed.<br><br> They will be saved upfront to ensure valid Cluster YAML can be saved.
     snapshots:
-      suffix: Snapshots per node
+      suffix: Snapshots
     systemService:
       rke2-coredns: 'CoreDNS'
       rke2-ingress-nginx: 'NGINX Ingress'
@@ -2152,15 +2166,18 @@ cluster:
         enable: Enable IPv6 support
     etcd:
       disableSnapshots:
-        label: Automatic Snapshots
+        label: Automatic Backups
       snapshotScheduleCron:
         label: Cron Schedule
       snapshotRetention:
-        label: Keep the last
+        label: Snapshot retention count 
+        tooltip: Each backup records 1 snapshot per etcd node. If you specify 3 snapshots and you have 3 etcd nodes you will only retain 1 full backup.
       exportMetric:
         label: Metrics
         false: Only available inside the cluster
         true: Exposed to the public interface
+      s3backups:
+        label: Save Backups to S3
   k3s:
     systemService:
       coredns: 'CoreDNS'
@@ -2449,7 +2466,25 @@ fleet:
       notReady: Not Ready
       waitApplied: Wait Applied
   gitRepo:
-    createLocalBanner: When deploying a Git Repo to the Local workspace you are unable to target any specific Cluster or Cluster Groups
+    actions:
+      forceUpdate:
+        label: Force Update
+        promptTitle: Force Update
+        promptNames: 'You are attempting to update: '
+        promptWarning: |-
+          {
+            count, plural,
+            =1 {Force update could be a long running process, the repository will be cloned again.}
+            other {Force update could be a long running process, the repositories will be cloned again.}
+          }
+      enablePolling:
+        label: Enable Polling
+      disablePolling:
+        label: Disable Polling
+      unpause:
+        label: Unpause
+      pause:
+        label: Pause
     tabs:
       resources: Resources
       unready: Non-Ready
@@ -2475,19 +2510,38 @@ fleet:
       noWorkspaces: There are no workspaces. <br/> Please create a workspace before adding repositories
     resources:
       label: 'Resource Handling'
-      keepResources: Always Keep Resources
+      keepResources: Always keep resources
       keepResourcesTooltip: When enabled, resources will be kept when deleting a GitRepo or Bundle - only Helm release secrets will be deleted.
-      correctDrift: Enable Self-Healing
+      correctDrift: Enable self-healing
       correctDriftTooltip: When enabled, Fleet will ensure that the cluster resources are kept in sync with the git repository. All resource changes made on the cluster will be lost.
+    polling:
+      label: Polling
+      enable: Enable Polling
+      pollingInterval:
+        label: Polling Interval
+        tooltip: Polling Interval is the time between a push to the Repository and Fleet's reaction to it.
+        webhookWarning: A webhook is configured in Rancher to reconcile Git updates and GitRepo resources. The Polling Interval will automatically be adjusted to 1 hour.
+        minimumValuewarning: The recommended minimum Polling Interval is 15 seconds. To avoid performance issues with GitRepos that contain a large amount of resources please consider increasing this value.
     add:
       steps:
-        repoInfo:
-          label: Repository Details
+        metadata:
+          label: Metadata
+          title: Specify the Git Repository name and labels/annotations
+          subtext: 'Define metadata details'
+          description: Git repository basic info
+        repo:
+          label: Repository details
           title: Specify the Git Repository to add to fleet
           subtext: 'Define repository details'
           description: Fleet will continuously monitor the Git Repository you configure below and synchronise the resources contained in it to the configured targets.
+        advanced:
+          label: Advanced
+          title: Specify advanced settings like authenticaion credentials and polling
+          subtext: 'Define advanced settings'
+          description: Fleet will use the authentication settings and polling to synchronise the resources contained in it.
+          info: These settings are for advanced usage and optional. You can skip them and finish the creation process.
         targetInfo:
-          label: Target Details
+          label: Target details
           title: Specify which target to synchronise this repository to
           subtext: 'Define target details'
           description: You can configure which clusters will be used as the target of synchronisation with the resources in the repository.
@@ -2637,6 +2691,8 @@ glance:
   secretsTable: Full secrets list
 
 clusterBadge:
+  badgeAppearance: Cluster Badge Appearance
+  clusterComment: "Cluster comment - {text}"
   customizeAppearance: Customize Appearance
   addLabel: Add Cluster Badge
   setClusterAppearance: Cluster Appearance
@@ -3096,6 +3152,7 @@ landing:
     title: You can change what you see when you login via preferences
     userPrefs: Preferences
     body: "You can change where you land when you login"
+    ariaLabelTakeMeToCluster: Select which cluster to take me to after login
     options:
       homePage: Take me to the home page
       lastVisited: Take me to the area I last visited
@@ -3402,7 +3459,9 @@ login:
     invalidSamlAttrs: "Invalid saml attributes"
     noResponse: "No response received"
   error: An error occurred logging in. Please try again.
+  invalidResponseError: Invalid response received to login request. Please try again.
   clientError: Invalid username or password. Please try again.
+  userUnauthorized: You are not authorized to use this system.
   specificError: 'An error occurred logging in: {msg}'
   useLocal: Use a local user
   loginWithProvider: Log in with {provider}
@@ -3428,6 +3487,7 @@ managementNode:
 
 members:
   clusterMembers: Cluster Members
+  memberRoles: Member Roles
   clusterAndProject: Cluster and Project Members
   createActionLabel: Add
   clusterMembership: Cluster Membership
@@ -4498,6 +4558,7 @@ plugins:
   tabs:
     all: All
     available: Available
+    builtin: Built-in
     images: Images
     installed: Installed
     updates: Updates
@@ -5051,6 +5112,7 @@ resourceDetail:
     view: "{subtype} {name}"
   masthead:
     age: Age
+    createdBy: Created by
     restartCount: Pod Restarts
     defaultBannerMessage:
       error: This resource is currently in an error state, but there isn't a detailed message available.
@@ -7606,8 +7668,7 @@ featureFlags:
 performance:
   label: UI Performance Settings
   settingName: Performance
-  experimental: This setting is experimental and may be removed or updated in future versions.
-  deprecatedForSSP: The <i class="mr-5">"{setting}"</i> setting is now deprecated and will be removed in a future release. Please use the <a href="#ssp-setting" class="ml-5 mr-5">Server-side Pagination</a> setting instead.
+  deprecatedForSSP: The <i class="mr-5">"{setting}"</i> setting is now deprecated and will be removed in a future release.
   incrementalLoad:
     label: Incremental Loading
     setting: You can configure the threshold above which incremental loading will be used.
@@ -7671,13 +7732,13 @@ performance:
     label: Server-side Pagination
     description: By default Lists will fetch all resources and paginate in the browser (create the page given sorting and filtering settings). Change this setting to enable pagination server-side. This should help the responsiveness of the UI in systems with a lot of resources.
     checkboxLabel: Enable Server-side Pagination
-    applicable: "This applies to the following resource types"
+    applicable: "Server-side pagination applies to Resource Types"
     incompatibleDescription: "Server-side Pagination is incompatible with Manual Refresh and Incremental Loading. Enabling this will disable them."
     featureFlag: The&nbsp;<a href="{ffUrl}">Feature Flag</a>&nbsp;`ui-sql-cache` must be enabled to use this feature
     resources:
       generic: most resources in the cluster's 'More Resources' section
       all: All Resources
-    populateDefaults: Populate with latest pagination defaults
+    experimental: This setting is experimental and may be removed or updated in future versions. We do not recommend enabling this setting in production environments.
 banner:
   label: Fixed Banners
   settingName: Banners

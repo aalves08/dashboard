@@ -80,6 +80,7 @@ export default {
   <app-modal
     v-if="showModal"
     ref="sshKnownHostsDialog"
+    data-testid="sshKnownHostsDialog"
     height="auto"
     :scrollable="true"
     @close="closeDialog(false)"
@@ -93,7 +94,6 @@ export default {
       <div class="custom mt-10">
         <div class="dialog-panel">
           <CodeMirror
-            class="code-mirror"
             :value="text"
             data-testid="ssh-known-hosts-dialog_code-mirror"
             :options="codeMirrorOptions"
@@ -145,14 +145,15 @@ export default {
       display: flex;
       flex-direction: column;
       min-height: 100px;
-      border: 1px solid var(--border);
 
       :deep() .code-mirror {
         display: flex;
         flex-direction: column;
         resize: none;
-        max-height: 400px;
-        height: 50vh;
+
+        .codemirror-container {
+          border: 1px solid var(--border);
+        }
 
         .CodeMirror,
         .CodeMirror-gutters {
