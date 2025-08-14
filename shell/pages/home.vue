@@ -30,6 +30,7 @@ import { sameContents } from '@shell/utils/array';
 import { PagTableFetchPageSecondaryResourcesOpts, PagTableFetchSecondaryResourcesOpts, PagTableFetchSecondaryResourcesReturns } from '@shell/types/components/paginatedResourceTable';
 import { CURRENT_RANCHER_VERSION } from '@shell/config/version';
 import { CAPI as CAPI_LAB_AND_ANO } from '@shell/config/labels-annotations';
+import AlexTest from '@shell/components/AlexTest';
 
 export default defineComponent({
   name:       'Home',
@@ -42,6 +43,7 @@ export default defineComponent({
     CommunityLinks,
     SingleClusterInfo,
     TabTitle,
+    AlexTest,
   },
 
   mixins: [PageHeaderActions],
@@ -490,6 +492,7 @@ export default defineComponent({
       pref-key="welcomeBanner"
       data-testid="home-banner-graphic"
     />
+    <AlexTest />
     <IndentedPanel class="mt-20 mb-20">
       <div class="row home-panels">
         <div class="col main-panel">
