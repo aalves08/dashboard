@@ -27,6 +27,8 @@ import {
   isChartVersionHigher,
   UI_PLUGIN_NAMESPACE,
   UI_PLUGIN_CHART_ANNOTATIONS,
+  UI_PLUGIN_METADATA,
+  UI_PLUGIN_BUNDLE_MEMBERS_ANNOTATION,
   UI_PLUGINS_REPOS,
   EXTENSIONS_INCOMPATIBILITY_TYPES
 } from '@shell/config/uiplugins';
@@ -76,6 +78,12 @@ export default {
       installedFromRepo:              {},
       errors:                         {},
       plugins:                        [], // The installed plugins
+      // Bundle members seen during this visit to the page, as name -> bundle name.
+      // Uninstalling a bundle deletes the member CRs, but the extensions stay loaded
+      // in the browser until a reload, so the CRs alone stop being enough to
+      // recognise them. Remembering them keeps the bundle's members from reappearing
+      // as individual cards in the gap between uninstall and reload.
+      seenBundleMembers:              {},
       helmOps:                        [], // Helm operations
       addExtensionReposBannerSetting: undefined,
       loading:                        true,
@@ -263,6 +271,47 @@ export default {
       }));
     },
 
+    /**
+     * Names of installed extensions that belong to a bundle (umbrella chart), mapped to
+     * the name of the bundle they belong to.
+     *
+     * Sourced from the UIPlugin CRs because the bundle marker is written into
+     * spec.plugin.metadata by the umbrella chart at install time.
+     */
+    bundleMembership() {
+      const membership = {};
+
+      (this.plugins || []).forEach((cr) => {
+        const bundleName = cr.pluginMetadata?.[UI_PLUGIN_METADATA.BUNDLE];
+
+        if (bundleName) {
+          membership[cr.name] = bundleName;
+        }
+      });
+
+      return membership;
+    },
+
+    /**
+     * Every extension known to belong to a bundle, including ones whose CR has just
+     * been removed by an uninstall but whose code is still loaded. See
+     * `seenBundleMembers`.
+     */
+    /**
+     * Every extension currently installed, by the name it occupies in the backend
+     * index - whether it got there standalone or as part of a bundle.
+     */
+    installedExtensionNames() {
+      return new Set((this.plugins || []).map((cr) => cr.name));
+    },
+
+    bundledMemberNames() {
+      return new Set([
+        ...Object.keys(this.bundleMembership),
+        ...Object.keys(this.seenBundleMembers),
+      ]);
+    },
+
     available() {
       let all = this.charts
         .filter((c) => isUIPlugin(c))
@@ -270,7 +319,18 @@ export default {
         .map((chart) => this.mapChartToPluginItem(chart))
         .filter((c) => c.versions.length > 0);
 
+      // Extensions installed as part of a bundle are represented by the bundle's own
+      // card, so they must not get one of their own. The marker lives on the CR's
+      // spec.plugin.metadata, which is why this is sourced from this.plugins rather than
+      // read off the loaded plugin - this.uiplugins entries carry the extension's own
+      // package.json, not CR data.
+      const bundledMemberNames = this.bundledMemberNames;
+
       this.uiplugins.forEach((p) => {
+        if (bundledMemberNames.has(p.name)) {
+          return;
+        }
+
         if (!all.find((c) => c.name === p.name)) {
           const item = this.buildLoadedPluginItem(p);
 
@@ -314,6 +374,19 @@ export default {
   },
 
   watch: {
+    // Accumulate bundle membership rather than tracking it, so a member stays
+    // recognised after its CR is deleted. Only grows while the page is open; a
+    // reload - which uninstalling asks for anyway - starts it empty again.
+    bundleMembership: {
+      handler(neu) {
+        Object.keys(neu || {}).forEach((name) => {
+          this.seenBundleMembers[name] = neu[name];
+        });
+      },
+      immediate: true,
+      deep:      true
+    },
+
     helmOps: {
       handler(neu) {
       // Get Helm operations for UI plugins and order by date
@@ -681,6 +754,53 @@ export default {
       }
     },
 
+    /**
+     * Why this extension cannot be installed right now, or null.
+     *
+     * An extension can only exist once on a cluster: the backend index is keyed by
+     * plugin name, and the loader resolves `window[<name>-<version>]`. So a bundle and
+     * a standalone copy of one of its members cannot both be installed - Helm would
+     * reject the second with an ownership error on the shared UIPlugin. Catch it here
+     * instead, while it can still be explained.
+     */
+    installConflict(plugin) {
+      if (plugin.installed || plugin.builtin) {
+        return null;
+      }
+
+      // Installing a bundle whose members are already installed by something else
+      if (plugin.bundleMemberNames?.length) {
+        const conflicting = plugin.bundleMemberNames.filter((name) => this.installedExtensionNames.has(name));
+
+        if (conflicting.length) {
+          return { type: 'bundle', names: conflicting };
+        }
+
+        return null;
+      }
+
+      // Installing an extension an installed bundle already provides
+      const owningBundle = this.bundleMembership[plugin.name];
+
+      if (owningBundle) {
+        return { type: 'member', names: [owningBundle] };
+      }
+
+      return null;
+    },
+
+    installConflictMessage(plugin) {
+      const conflict = this.installConflict(plugin);
+
+      if (!conflict) {
+        return '';
+      }
+
+      const names = conflict.names.join(', ');
+
+      return conflict.type === 'bundle' ? this.t('plugins.conflict.bundleBlocked', { names }, true) : this.t('plugins.conflict.memberBlocked', { name: names }, true);
+    },
+
     getPluginActions(plugin) {
       const actions = [];
 
@@ -715,15 +835,13 @@ export default {
             icon:   'icon-delete',
           });
         }
-      } else {
-        if (plugin.installableVersions?.length) {
-          actions.push({
-            label:   this.t('plugins.install.label'),
-            action:  'install',
-            icon:    'icon-plus',
-            enabled: true,
-          });
-        }
+      } else if (plugin.installableVersions?.length && !this.installConflict(plugin)) {
+        actions.push({
+          label:   this.t('plugins.install.label'),
+          action:  'install',
+          icon:    'icon-plus',
+          enabled: true,
+        });
       }
 
       return actions;
@@ -839,6 +957,12 @@ export default {
         tooltipMsgs.push(incompatibilityMsg);
       }
 
+      const conflictMsg = this.installConflictMessage(plugin);
+
+      if (conflictMsg) {
+        tooltipMsgs.push(conflictMsg);
+      }
+
       if (tooltipMsgs.length) {
         statuses.push({
           icon:    'icon-alert-alt',
@@ -896,6 +1020,13 @@ export default {
         builtin:                false,
         chart,
         incompatibilityMessage: '',
+        // Members of a bundle, from the chart annotation rather than from any CR, so
+        // a conflict can be spotted before the bundle is installed. Empty for a
+        // regular extension.
+        bundleMemberNames:      (uiPluginAnnotation(chart, UI_PLUGIN_BUNDLE_MEMBERS_ANNOTATION) || '')
+          .split(',')
+          .map((n) => n.trim())
+          .filter((n) => !!n),
       };
 
       item.installableVersions = item.versions.filter((version) => isSupportedChartVersion({
@@ -964,7 +1095,64 @@ export default {
       };
     },
 
+    /**
+     * Wire a member of a bundle onto the bundle's own card.
+     *
+     * A bundle is a single Helm release whose subcharts each create their own UIPlugin
+     * CR, so the CR name never matches the chart name and the standard lookup below
+     * would spawn one orphan card per member. Resolve against the bundle instead, and
+     * never push a card of our own - the bundle has exactly one card by definition.
+     */
+    wireBundledPluginCRToChart(pluginCR, bundleName, all) {
+      const app = this.apps.find((a) => a.metadata.name === bundleName && a.metadata.namespace === UI_PLUGIN_NAMESPACE);
+      const chart = all.find((c) => c.name === bundleName);
+
+      if (!chart) {
+        // The bundle's chart isn't in the catalog - the repo was removed, or it was
+        // installed from somewhere we can't see. Nothing to wire onto, and pushing a
+        // card per member here is exactly what we're avoiding, so bail.
+        return;
+      }
+
+      chart.installed = true;
+      chart.isBundle = true;
+      chart.uiplugin = chart.uiplugin || pluginCR;
+
+      // available() is a computed rebuilt from scratch, so this accumulates cleanly
+      // across the one call made per member CR.
+      chart.bundleMembers = [...(chart.bundleMembers || []), pluginCR];
+      chart.installing = this.installing[chart.id];
+
+      // A bundle's version is the umbrella chart's version, never a member's
+      const appChartVersion = app?.spec?.chart?.metadata?.version;
+      const installedVersion = chart.versions?.find((v) => v.version === appChartVersion);
+
+      chart.installedVersion = installedVersion?.version ?? appChartVersion ?? chart.installedVersion;
+      chart.displayVersion = chart.installedVersion;
+      chart.displayVersionLabel = installedVersion ? getPluginChartVersionLabel(installedVersion) : chart.installedVersion;
+
+      if (installedVersion) {
+        chart.created = installedVersion.created;
+        chart.icon = installedVersion.icon || chart.icon;
+
+        Object.assign(chart, this.extractCertificationFlags(installedVersion.annotations));
+      }
+
+      const latestInstallableVersion = chart.installableVersions?.[0];
+
+      if (latestInstallableVersion && chart.installedVersion &&
+          compareChartVersions(latestInstallableVersion.version, chart.installedVersion) > 0) {
+        chart.upgrade = getPluginChartVersionLabel(latestInstallableVersion);
+      }
+    },
+
     wirePluginCRToChart(pluginCR, all) {
+      const bundleName = this.bundleMembership[pluginCR.name];
+
+      if (bundleName) {
+        return this.wireBundledPluginCRToChart(pluginCR, bundleName, all);
+      }
+
       const app = this.apps.find((a) => a.metadata.name === pluginCR.name && a.metadata.namespace === UI_PLUGIN_NAMESPACE);
       const originalRepoName = app?.spec?.chart?.metadata?.annotations?.[CATALOG_ANNOTATIONS.SOURCE_REPO_NAME] || app?.metadata?.labels?.[CATALOG_ANNOTATIONS.CLUSTER_REPO_NAME];
 

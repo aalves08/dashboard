@@ -16,6 +16,30 @@ if [[ "${GITHUB_WORKFLOW_TYPE}" == "catalog" ]]; then
     gh run cancel ${GITHUB_RUN_ID}
     exit 1
   fi
+# Ensure a "bundle" release tag matches some rancher.bundles[] entry. Bundle tags are
+# self-identifying - "bundle-<name>-<version>" - so the shape of the tag selects this
+# branch rather than a separate workflow input, and one release workflow can publish
+# both individual extensions and bundles.
+#
+# The bundle name may itself contain hyphens, so split off the fixed "bundle-" prefix
+# and the trailing version and treat everything in between as the name.
+elif [[ "${GITHUB_RELEASE_TAG}" == bundle-?*-?* ]]; then
+  TAG_BODY="${GITHUB_RELEASE_TAG#bundle-}"
+  BUNDLE_VERSION="${TAG_BODY##*-}"
+  BUNDLE_NAME="${TAG_BODY%-*}"
+
+  echo "Parsed as a bundle release: name '${BUNDLE_NAME}', version '${BUNDLE_VERSION}'"
+
+  MATCH=$(jq -r --arg n "${BUNDLE_NAME}" --arg v "${BUNDLE_VERSION}" \
+    '(.rancher.bundles // []) | map(select(.name == $n and .version == $v)) | length' package.json)
+
+  if [[ "${MATCH}" != "1" ]]; then
+    echo -e "release tag doesn't match any bundle: ${GITHUB_RELEASE_TAG}"
+    echo -e "Looking for name '${BUNDLE_NAME}' at version '${BUNDLE_VERSION}' in rancher.bundles[] of the root package.json. Declared bundles:"
+    jq -r '(.rancher.bundles // [])[] | "  \(.name) \(.version)"' package.json
+    gh run cancel ${GITHUB_RUN_ID}
+    exit 1
+  fi
 # Ensure "chart" workflow release tag name matches some pkg/<pkg-name>
 else
   NO_MATCHES="true"

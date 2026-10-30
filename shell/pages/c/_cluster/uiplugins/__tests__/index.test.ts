@@ -3,6 +3,7 @@ import UiPluginsPage from '@shell/pages/c/_cluster/uiplugins/index.vue';
 import {
   UI_PLUGIN_NAMESPACE,
   UI_PLUGIN_CHART_ANNOTATIONS,
+  UI_PLUGIN_METADATA,
   EXTENSIONS_INCOMPATIBILITY_TYPES
 } from '@shell/config/uiplugins';
 import { CATALOG as CATALOG_ANNOTATIONS } from '@shell/config/labels-annotations';
@@ -18,6 +19,17 @@ interface ChartVersionContext {
 }
 
 const versionContextOf = (wrapper: { vm: unknown }): ChartVersionContext => wrapper.vm as ChartVersionContext;
+
+/**
+ * `plugins` is a `data()` member of `uiplugins/index.vue` initialised to `[]`, so
+ * `vue-tsc` infers its type as exactly `never[]` and rejects the UIPlugin fixtures
+ * these tests seed it with.
+ */
+interface PluginListContext {
+  plugins: any[];
+}
+
+const pluginListOf = (wrapper: { vm: unknown }): PluginListContext => wrapper.vm as PluginListContext;
 
 /**
  * `mapChartToPluginItem` (see `uiplugins/index.vue`) returns an object literal and
@@ -1836,6 +1848,398 @@ describe('page: UI plugins/Extensions', () => {
       });
 
       expect(w.find('.plugin-cards').attributes('aria-labelledby')).toBeUndefined();
+    });
+  });
+
+  describe('bundled extensions', () => {
+    const BUNDLE = 'security-ui-exts';
+    const MEMBERS = ['vulnerability-scanner', 'runtime-enforcer'];
+
+    /**
+     * A UIPlugin CR. Members of a bundle carry the bundle's name in
+     * spec.plugin.metadata, surfaced by the model's `pluginMetadata` getter.
+     */
+    const crFor = (name: string, version: string, bundle: string | null = BUNDLE) => ({
+      name,
+      version,
+      pluginMetadata: bundle ? { [UI_PLUGIN_METADATA.BUNDLE]: bundle } : {},
+    });
+
+    /**
+     * An entry from the uiplugins store: a Plugin built at load time from the
+     * extension's own package.json, with no knowledge of the CR that installed it.
+     */
+    const loadedPlugin = (name: string, version: string) => ({
+      name,
+      id:       `${ name }-${ version }`,
+      metadata: {
+        name,
+        version,
+        rancher: { annotations: { [UI_PLUGIN_CHART_ANNOTATIONS.DISPLAY_NAME]: name } }
+      },
+    });
+
+    const appFor = (name: string, chartVersion: string): any => ({
+      metadata: { name, namespace: UI_PLUGIN_NAMESPACE },
+      spec:     { chart: { metadata: { version: chartVersion, annotations: {} } } }
+    });
+
+    const createWrapper = ({
+      rawCharts = {}, uiplugins = [], apps = [], plugins = []
+    }: {
+      rawCharts?: Record<string, any>, uiplugins?: any[], apps?: any[], plugins?: any[]
+    } = {}) => {
+      const store = {
+        getters: {
+          'prefs/get':         jest.fn(),
+          'catalog/rawCharts': rawCharts,
+          'uiplugins/plugins': uiplugins,
+          'uiplugins/errors':  {},
+          'management/all':    () => apps,
+          'i18n/withFallback': (_key: string, _fallback: null, repoName: string) => repoName,
+        },
+        dispatch: () => Promise.resolve(),
+      };
+
+      const w = shallowMount(UiPluginsPage, {
+        global: {
+          mocks: { $store: store, t },
+          stubs: { ActionMenu: { template: '<div />' } }
+        }
+      });
+
+      w.vm.installing = {};
+      pluginListOf(w).plugins = plugins;
+
+      return w;
+    };
+
+    const bundleChart = () => ({
+      [BUNDLE]: {
+        chartName:   BUNDLE,
+        repoName:    'test-repo',
+        annotations: { [UI_PLUGIN_CHART_ANNOTATIONS.DISPLAY_NAME]: 'SUSE Security' },
+        versions:    [{
+          version:     '1.0.0',
+          annotations: {
+            'catalog.cattle.io/ui-component':           'plugins',
+            [UI_PLUGIN_CHART_ANNOTATIONS.DISPLAY_NAME]: 'SUSE Security',
+          },
+        }],
+      }
+    });
+
+    describe('bundleMembership', () => {
+      it('should map each member to the bundle that owns it', () => {
+        const w = createWrapper({ plugins: [crFor(MEMBERS[0], '0.9.1'), crFor(MEMBERS[1], '0.1.0')] });
+
+        expect(w.vm.bundleMembership).toStrictEqual({
+          [MEMBERS[0]]: BUNDLE,
+          [MEMBERS[1]]: BUNDLE,
+        });
+      });
+
+      it('should ignore extensions installed outside a bundle', () => {
+        const w = createWrapper({ plugins: [crFor('standalone', '1.0.0', null)] });
+
+        expect(w.vm.bundleMembership).toStrictEqual({});
+        expect(w.vm.bundledMemberNames.size).toBe(0);
+      });
+
+      it('should keep recognising a member after its CR is removed', async() => {
+        // Uninstalling deletes the CRs, but the extensions stay loaded in the browser
+        // until the page is reloaded, so membership has to outlive the CR
+        const w = createWrapper({ plugins: [crFor(MEMBERS[0], '0.9.1'), crFor(MEMBERS[1], '0.1.0')] });
+
+        // membership is recorded by a watcher, which Vue flushes on the next tick
+        await w.vm.$nextTick();
+
+        expect(w.vm.bundledMemberNames.size).toBe(2);
+
+        pluginListOf(w).plugins = [];
+
+        expect(w.vm.bundleMembership).toStrictEqual({});
+        expect(w.vm.bundledMemberNames.size).toBe(2);
+      });
+    });
+
+    describe('wirePluginCRToChart', () => {
+      it('should wire members onto the bundle card rather than creating orphans', () => {
+        const w = createWrapper({
+          apps:    [appFor(BUNDLE, '1.0.0')],
+          plugins: [crFor(MEMBERS[0], '0.9.1'), crFor(MEMBERS[1], '0.1.0')]
+        });
+
+        const all: any[] = [{
+          name:                BUNDLE,
+          versions:            [{ version: '1.0.0' }],
+          installableVersions: [{ version: '1.0.0' }],
+        }];
+
+        w.vm.wirePluginCRToChart(crFor(MEMBERS[0], '0.9.1'), all);
+        w.vm.wirePluginCRToChart(crFor(MEMBERS[1], '0.1.0'), all);
+
+        expect(all).toHaveLength(1);
+        expect(all[0].name).toBe(BUNDLE);
+        expect(all[0].installed).toBe(true);
+        expect(all[0].isBundle).toBe(true);
+        expect(all[0].bundleMembers.map((m: any) => m.name)).toStrictEqual(MEMBERS);
+      });
+
+      it('should report the bundle chart version, not a member version', () => {
+        const w = createWrapper({
+          apps:    [appFor(BUNDLE, '1.0.0')],
+          plugins: [crFor(MEMBERS[0], '0.9.1')]
+        });
+
+        const all: any[] = [{ name: BUNDLE, versions: [{ version: '1.0.0' }] }];
+
+        w.vm.wirePluginCRToChart(crFor(MEMBERS[0], '0.9.1'), all);
+
+        expect(all[0].installedVersion).toBe('1.0.0');
+        expect(all[0].displayVersion).toBe('1.0.0');
+      });
+
+      it('should offer an upgrade when a newer bundle version is installable', () => {
+        const w = createWrapper({
+          apps:    [appFor(BUNDLE, '1.0.0')],
+          plugins: [crFor(MEMBERS[0], '0.9.1')]
+        });
+
+        const all: any[] = [{
+          name:                BUNDLE,
+          versions:            [{ version: '1.0.1' }, { version: '1.0.0' }],
+          installableVersions: [{ version: '1.0.1' }],
+        }];
+
+        w.vm.wirePluginCRToChart(crFor(MEMBERS[0], '0.9.1'), all);
+
+        expect(all[0].upgrade).toBeDefined();
+      });
+
+      it('should not offer an upgrade when the installed bundle is the latest', () => {
+        const w = createWrapper({
+          apps:    [appFor(BUNDLE, '1.0.0')],
+          plugins: [crFor(MEMBERS[0], '0.9.1')]
+        });
+
+        const all: any[] = [{
+          name:                BUNDLE,
+          versions:            [{ version: '1.0.0' }],
+          installableVersions: [{ version: '1.0.0' }],
+        }];
+
+        w.vm.wirePluginCRToChart(crFor(MEMBERS[0], '0.9.1'), all);
+
+        expect(all[0].upgrade).toBeUndefined();
+      });
+
+      it('should create no card when the bundle chart is missing from the catalog', () => {
+        const w = createWrapper({ plugins: [crFor(MEMBERS[0], '0.9.1')] });
+        const all: any[] = [];
+
+        w.vm.wirePluginCRToChart(crFor(MEMBERS[0], '0.9.1'), all);
+
+        expect(all).toHaveLength(0);
+      });
+
+      it('should leave standalone extensions on the existing code path', () => {
+        const app = appFor('standalone', '2.0.0');
+
+        app.metadata.labels = { [CATALOG_ANNOTATIONS.CLUSTER_REPO_NAME]: 'rancher-charts' };
+
+        const w = createWrapper({ apps: [app], plugins: [crFor('standalone', '2.0.0', null)] });
+
+        const all: any[] = [{
+          name:     'standalone',
+          chart:    { repoName: 'rancher-charts' },
+          versions: [{ version: '2.0.0' }]
+        }];
+
+        w.vm.wirePluginCRToChart(crFor('standalone', '2.0.0', null), all);
+
+        expect(all).toHaveLength(1);
+        expect(all[0].installed).toBe(true);
+        expect(all[0].isBundle).toBeUndefined();
+      });
+    });
+
+    describe('reading members off the chart', () => {
+      const chartWith = (membersAnnotation?: string) => ({
+        chartName: BUNDLE,
+        versions:  [{
+          version:     '1.0.0',
+          annotations: {
+            'catalog.cattle.io/ui-component': 'plugins',
+            ...(membersAnnotation === undefined ? {} : { 'catalog.cattle.io/ui-extensions-bundle-members': membersAnnotation }),
+          },
+        }],
+      });
+
+      it('should read a bundle\'s members from the chart annotation', () => {
+        const w = createWrapper();
+        const item = w.vm.mapChartToPluginItem(chartWith(MEMBERS.join(',')));
+
+        expect(item.bundleMemberNames).toStrictEqual(MEMBERS);
+      });
+
+      it('should tolerate spacing around the member names', () => {
+        const w = createWrapper();
+        const item = w.vm.mapChartToPluginItem(chartWith(' vulnerability-scanner ,  runtime-enforcer '));
+
+        expect(item.bundleMemberNames).toStrictEqual(MEMBERS);
+      });
+
+      it('should give a regular extension no members', () => {
+        const w = createWrapper();
+
+        expect(w.vm.mapChartToPluginItem(chartWith()).bundleMemberNames).toStrictEqual([]);
+        expect(w.vm.mapChartToPluginItem(chartWith('')).bundleMemberNames).toStrictEqual([]);
+      });
+    });
+
+    describe('installedExtensionNames', () => {
+      it('should count extensions installed standalone and as bundle members alike', () => {
+        const w = createWrapper({ plugins: [crFor(MEMBERS[0], '0.9.2'), crFor('standalone', '1.0.0', null)] });
+
+        expect([...w.vm.installedExtensionNames].sort()).toStrictEqual([MEMBERS[0], 'standalone'].sort());
+      });
+    });
+
+    describe('install conflicts', () => {
+      const bundleCard = (members: string[]) => ({
+        name:                BUNDLE,
+        bundleMemberNames:   members,
+        installed:           false,
+        installableVersions: [{ version: '1.0.0' }],
+      });
+
+      const singleCard = (name: string) => ({
+        name,
+        bundleMemberNames:   [],
+        installed:           false,
+        installableVersions: [{ version: '0.1.1' }],
+      });
+
+      it('should block a bundle when one of its members is already installed', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1', null)] });
+        const conflict = w.vm.installConflict(bundleCard(MEMBERS));
+
+        expect(conflict).toStrictEqual({ type: 'bundle', names: ['runtime-enforcer'] });
+        expect(w.vm.getPluginActions(bundleCard(MEMBERS))).toStrictEqual([]);
+      });
+
+      it('should block an extension an installed bundle already provides', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1')] });
+        const conflict = w.vm.installConflict(singleCard('runtime-enforcer'));
+
+        expect(conflict).toStrictEqual({ type: 'member', names: [BUNDLE] });
+        expect(w.vm.getPluginActions(singleCard('runtime-enforcer'))).toStrictEqual([]);
+      });
+
+      it('should allow a bundle when none of its members are installed', () => {
+        const w = createWrapper({ plugins: [] });
+
+        expect(w.vm.installConflict(bundleCard(MEMBERS))).toBeNull();
+        expect(w.vm.getPluginActions(bundleCard(MEMBERS))[0].action).toBe('install');
+      });
+
+      it('should allow an unrelated extension while a bundle is installed', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1')] });
+
+        expect(w.vm.installConflict(singleCard('network'))).toBeNull();
+        expect(w.vm.getPluginActions(singleCard('network'))[0].action).toBe('install');
+      });
+
+      it('should name every conflicting member, not just the first', () => {
+        const w = createWrapper({ plugins: [crFor(MEMBERS[0], '0.9.2', null), crFor(MEMBERS[1], '0.1.1', null)] });
+
+        expect(w.vm.installConflict(bundleCard(MEMBERS))?.names).toStrictEqual(MEMBERS);
+      });
+
+      it('should not block something already installed', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1')] });
+
+        expect(w.vm.installConflict({ ...singleCard('runtime-enforcer'), installed: true })).toBeNull();
+      });
+
+      it('should name the blocking bundle when an extension is already provided', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1')] });
+
+        expect(w.vm.installConflictMessage(singleCard('runtime-enforcer'))).toContain(BUNDLE);
+      });
+
+      it('should name the blocking members when a bundle is blocked', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1', null)] });
+
+        expect(w.vm.installConflictMessage(bundleCard(MEMBERS))).toContain('runtime-enforcer');
+      });
+
+      it('should say nothing when there is no conflict', () => {
+        const w = createWrapper({ plugins: [] });
+
+        expect(w.vm.installConflictMessage(bundleCard(MEMBERS))).toBe('');
+      });
+
+      it('should surface the reason on the card', () => {
+        const w = createWrapper({ plugins: [crFor('runtime-enforcer', '0.1.1')] });
+        const statuses = w.vm.getStatuses(singleCard('runtime-enforcer'));
+
+        expect(statuses.some((st: any) => st.color === 'error' && st.tooltip.text.length)).toBe(true);
+      });
+    });
+
+    describe('available', () => {
+      /**
+       * The behaviour the whole feature exists for. Without it an installed two-member
+       * bundle yields three cards: the bundle's own, plus an orphan per member.
+       */
+      it('should show exactly one card for an installed bundle', () => {
+        const w = createWrapper({
+          rawCharts: bundleChart(),
+          uiplugins: [loadedPlugin(MEMBERS[0], '0.9.1'), loadedPlugin(MEMBERS[1], '0.1.0')],
+          apps:      [appFor(BUNDLE, '1.0.0')],
+          plugins:   [crFor(MEMBERS[0], '0.9.1'), crFor(MEMBERS[1], '0.1.0')],
+        });
+
+        const cards = w.vm.available;
+
+        expect(cards).toHaveLength(1);
+        expect(cards[0].name).toBe(BUNDLE);
+        expect(cards[0].installed).toBe(true);
+        expect(cards[0].isBundle).toBe(true);
+      });
+
+      it('should keep showing one card after an uninstall, before the page reloads', async() => {
+        const w = createWrapper({
+          rawCharts: bundleChart(),
+          uiplugins: [loadedPlugin(MEMBERS[0], '0.9.1'), loadedPlugin(MEMBERS[1], '0.1.0')],
+          apps:      [appFor(BUNDLE, '1.0.0')],
+          plugins:   [crFor(MEMBERS[0], '0.9.1'), crFor(MEMBERS[1], '0.1.0')],
+        });
+
+        // let the watcher record membership before the CRs go away
+        await w.vm.$nextTick();
+
+        expect(w.vm.available).toHaveLength(1);
+
+        // Helm removed the CRs, but the extensions are still loaded in this page
+        pluginListOf(w).plugins = [];
+
+        const cards = w.vm.available;
+
+        expect(cards).toHaveLength(1);
+        expect(cards[0].name).toBe(BUNDLE);
+      });
+
+      it('should still card a loaded extension that belongs to no bundle', () => {
+        const w = createWrapper({
+          uiplugins: [loadedPlugin('standalone', '1.0.0')],
+          plugins:   [],
+        });
+
+        expect(w.vm.available.map((c: any) => c.name)).toStrictEqual(['standalone']);
+      });
     });
   });
 });
